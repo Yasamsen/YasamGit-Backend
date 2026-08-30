@@ -1,8 +1,18 @@
-export default function handler(req, res) {
-  res.status(200).json({
+const {
+  method,
+  json
+} = require("../lib/response");
+
+module.exports = function handler(req, res) {
+  if (!method(req, res, ["GET"])) {
+    return;
+  }
+
+  json(res, 200, {
     ok: true,
-    service: "YasamGit Backend",
+    service:
+      "YasamGit Backend",
     version: "5.2.0",
     status: "online"
   });
-}
+};
