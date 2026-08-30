@@ -2,314 +2,540 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
-    content="width=device-width,initial-scale=1"
+    content="width=device-width, initial-scale=1.0"
   >
 
-  <title>YasamGit V5.2</title>
+  <meta
+    name="theme-color"
+    content="#0f172a"
+  >
+
+  <title>YasamGit</title>
 
   <style>
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      margin: 0;
-      background: #020617;
-      color: #e5e7eb;
       font-family:
         Arial,
+        Helvetica,
         sans-serif;
-    }
 
-    button,
-    input,
-    textarea {
-      font: inherit;
-    }
+      background:
+        #0f172a;
 
-    button {
-      cursor: pointer;
-    }
+      color:
+        #e5e7eb;
 
-    .hidden {
-      display: none !important;
+      min-height:
+        100vh;
     }
 
     .container {
-      width: min(
-        1100px,
-        100%
-      );
+      width:
+        min(100% - 32px, 1100px);
 
-      margin: auto;
-      padding: 16px;
+      margin:
+        0 auto;
     }
 
-    .card {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 16px;
+    header {
+      border-bottom:
+        1px solid #1e293b;
+
+      background:
+        #0f172a;
     }
 
-    .login {
-      max-width: 420px;
-      margin: 10vh auto;
+    .navbar {
+      min-height:
+        70px;
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        space-between;
+
+      gap:
+        20px;
     }
 
-    .logo {
-      font-size: 25px;
-      font-weight: bold;
+    .brand {
+      font-size:
+        24px;
+
+      font-weight:
+        800;
+
+      color:
+        #ffffff;
     }
 
-    .muted {
-      color: #94a3b8;
-    }
-
-    label {
-      display: block;
-      margin: 15px 0 7px;
-    }
-
-    input,
-    textarea {
-      width: 100%;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      background: #020617;
-      color: white;
-      padding: 12px;
-      outline: none;
-    }
-
-    input:focus,
-    textarea:focus {
-      border-color: #3b82f6;
-    }
-
-    textarea {
-      min-height: 400px;
-      resize: vertical;
-      font-family: monospace;
-    }
-
-    .btn {
-      border: 0;
-      border-radius: 10px;
-      padding: 10px 15px;
-      background: #2563eb;
-      color: white;
-      font-weight: bold;
-    }
-
-    .btn:hover {
-      opacity: .9;
-    }
-
-    .danger {
-      background: #dc2626;
-    }
-
-    .success {
-      background: #059669;
-    }
-
-    .secondary {
-      background: #334155;
-    }
-
-    .full {
-      width: 100%;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+    .brand span {
+      color:
+        #60a5fa;
     }
 
     .status {
-      margin-top: 12px;
-      padding: 11px;
-      border-radius: 10px;
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      gap:
+        8px;
+
+      font-size:
+        13px;
+
+      color:
+        #94a3b8;
     }
 
-    .error {
-      background: #450a0a;
-      color: #fecaca;
+    .dot {
+      width:
+        9px;
+
+      height:
+        9px;
+
+      border-radius:
+        50%;
+
+      background:
+        #22c55e;
     }
 
-    .ok {
-      background: #052e16;
-      color: #bbf7d0;
+    main {
+      padding:
+        60px 0;
     }
 
-    .repo-grid {
-      display: grid;
+    .hero {
+      text-align:
+        center;
+
+      margin-bottom:
+        40px;
+    }
+
+    .hero h1 {
+      font-size:
+        clamp(32px, 6vw, 58px);
+
+      line-height:
+        1.05;
+
+      color:
+        #ffffff;
+
+      margin-bottom:
+        18px;
+    }
+
+    .hero p {
+      color:
+        #94a3b8;
+
+      max-width:
+        650px;
+
+      margin:
+        0 auto;
+
+      line-height:
+        1.7;
+    }
+
+    .card {
+      max-width:
+        480px;
+
+      margin:
+        0 auto;
+
+      background:
+        #111827;
+
+      border:
+        1px solid #1e293b;
+
+      border-radius:
+        18px;
+
+      padding:
+        28px;
+
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, .25);
+    }
+
+    .card h2 {
+      color:
+        #ffffff;
+
+      margin-bottom:
+        8px;
+    }
+
+    .card-description {
+      color:
+        #94a3b8;
+
+      font-size:
+        14px;
+
+      line-height:
+        1.6;
+
+      margin-bottom:
+        24px;
+    }
+
+    label {
+      display:
+        block;
+
+      margin-bottom:
+        8px;
+
+      color:
+        #cbd5e1;
+
+      font-size:
+        14px;
+
+      font-weight:
+        600;
+    }
+
+    input {
+      width:
+        100%;
+
+      padding:
+        13px 14px;
+
+      border:
+        1px solid #334155;
+
+      border-radius:
+        10px;
+
+      outline:
+        none;
+
+      background:
+        #0f172a;
+
+      color:
+        #ffffff;
+
+      font-size:
+        15px;
+
+      margin-bottom:
+        14px;
+    }
+
+    input:focus {
+      border-color:
+        #60a5fa;
+    }
+
+    button {
+      width:
+        100%;
+
+      padding:
+        13px 16px;
+
+      border:
+        0;
+
+      border-radius:
+        10px;
+
+      background:
+        #2563eb;
+
+      color:
+        #ffffff;
+
+      font-size:
+        15px;
+
+      font-weight:
+        700;
+
+      cursor:
+        pointer;
+
+      transition:
+        .2s;
+    }
+
+    button:hover {
+      background:
+        #1d4ed8;
+    }
+
+    button:disabled {
+      opacity:
+        .6;
+
+      cursor:
+        not-allowed;
+    }
+
+    .message {
+      margin-top:
+        16px;
+
+      padding:
+        12px;
+
+      border-radius:
+        10px;
+
+      font-size:
+        14px;
+
+      line-height:
+        1.5;
+
+      display:
+        none;
+    }
+
+    .message.show {
+      display:
+        block;
+    }
+
+    .message.success {
+      background:
+        rgba(34, 197, 94, .1);
+
+      border:
+        1px solid rgba(34, 197, 94, .3);
+
+      color:
+        #86efac;
+    }
+
+    .message.error {
+      background:
+        rgba(239, 68, 68, .1);
+
+      border:
+        1px solid rgba(239, 68, 68, .3);
+
+      color:
+        #fca5a5;
+    }
+
+    .dashboard {
+      display:
+        none;
+
+      max-width:
+        900px;
+
+      margin:
+        0 auto;
+    }
+
+    .dashboard.show {
+      display:
+        block;
+    }
+
+    .dashboard-header {
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        space-between;
+
+      gap:
+        15px;
+
+      margin-bottom:
+        20px;
+    }
+
+    .dashboard-header h2 {
+      color:
+        #ffffff;
+    }
+
+    .logout {
+      width:
+        auto;
+
+      padding:
+        10px 16px;
+
+      background:
+        #dc2626;
+    }
+
+    .logout:hover {
+      background:
+        #b91c1c;
+    }
+
+    .grid {
+      display:
+        grid;
+
       grid-template-columns:
-        repeat(
-          auto-fill,
-          minmax(250px, 1fr)
-        );
+        repeat(auto-fit, minmax(200px, 1fr));
 
-      gap: 12px;
-      margin-top: 15px;
+      gap:
+        16px;
     }
 
-    .repo {
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 15px;
+    .feature {
+      background:
+        #111827;
+
+      border:
+        1px solid #1e293b;
+
+      border-radius:
+        14px;
+
+      padding:
+        20px;
     }
 
-    .repo-name {
-      font-size: 17px;
-      font-weight: bold;
-      word-break: break-word;
+    .feature h3 {
+      color:
+        #ffffff;
+
+      margin-bottom:
+        8px;
     }
 
-    .repo-desc {
-      min-height: 35px;
-      margin: 8px 0 13px;
-      color: #94a3b8;
-      font-size: 13px;
+    .feature p {
+      color:
+        #94a3b8;
+
+      font-size:
+        14px;
+
+      line-height:
+        1.5;
     }
 
-    .files {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 15px;
+    .api-info {
+      margin-top:
+        30px;
+
+      background:
+        #020617;
+
+      border:
+        1px solid #1e293b;
+
+      border-radius:
+        14px;
+
+      padding:
+        20px;
     }
 
-    .file {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 12px;
+    .api-info h3 {
+      margin-bottom:
+        12px;
+
+      color:
+        #ffffff;
     }
 
-    .file-name {
-      font-weight: bold;
-      word-break: break-word;
-      cursor: pointer;
+    .api-info code {
+      display:
+        block;
+
+      color:
+        #93c5fd;
+
+      font-family:
+        monospace;
+
+      font-size:
+        13px;
+
+      line-height:
+        1.8;
+
+      overflow-x:
+        auto;
     }
 
-    .file-meta {
-      color: #64748b;
-      font-size: 11px;
-      margin-top: 4px;
+    footer {
+      text-align:
+        center;
+
+      padding:
+        30px 0;
+
+      color:
+        #64748b;
+
+      font-size:
+        13px;
     }
 
-    .file-actions {
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
+    .hidden {
+      display:
+        none !important;
     }
 
-    .small {
-      border: 0;
-      border-radius: 7px;
-      padding: 7px 9px;
-      background: #334155;
-      color: white;
-    }
+    @media (max-width: 600px) {
+      .navbar {
+        min-height:
+          60px;
+      }
 
-    .small-danger {
-      background: #991b1b;
-    }
-
-    .empty {
-      text-align: center;
-      color: #64748b;
-      padding: 25px;
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      z-index: 999;
-      background: rgba(
-        0,
-        0,
-        0,
-        .82
-      );
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 15px;
-    }
-
-    .modal-box {
-      width: min(
-        900px,
-        100%
-      );
-
-      max-height: 90vh;
-      overflow: auto;
-
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 15px;
-      padding: 16px;
-    }
-
-    pre {
-      white-space: pre-wrap;
-      word-break: break-word;
-      background: #020617;
-      border-radius: 10px;
-      padding: 15px;
-      max-height: 65vh;
-      overflow: auto;
-    }
-
-    .preview {
-      max-width: 100%;
-      max-height: 70vh;
-      display: block;
-      margin: auto;
-    }
-
-    @media(max-width:600px) {
-      .container {
-        padding: 10px;
+      main {
+        padding:
+          35px 0;
       }
 
       .card {
-        padding: 14px;
+        padding:
+          22px;
       }
 
-      .file {
-        flex-direction: column;
-        align-items: flex-start;
+      .dashboard-header {
+        align-items:
+          flex-start;
+
+        flex-direction:
+          column;
       }
 
-      .file-actions {
-        width: 100%;
-      }
-
-      .small {
-        flex: 1;
+      .logout {
+        width:
+          100%;
       }
     }
   </style>
@@ -317,1818 +543,562 @@
 
 <body>
 
-<div class="container">
+<header>
+  <div class="container navbar">
 
-  <!-- LOGIN -->
+    <div class="brand">
+      Yasam<span>Git</span>
+    </div>
 
-  <section id="loginPage">
+    <div class="status">
+      <span class="dot"></span>
+      <span id="backendStatus">
+        Checking backend...
+      </span>
+    </div>
 
-    <div class="card login">
+  </div>
+</header>
 
-      <div class="logo">
-        🔐 YasamGit
-      </div>
 
-      <p class="muted">
-        GitHub Repository Manager
-        V5.2
+<main>
+
+  <div class="container">
+
+    <section class="hero">
+
+      <h1>
+        YasamGit
+      </h1>
+
+      <p>
+        Git repository manager sederhana dengan
+        backend V5.2 yang berjalan langsung di Vercel.
+      </p>
+
+    </section>
+
+
+    <!-- LOGIN -->
+
+    <section
+      id="loginSection"
+      class="card"
+    >
+
+      <h2>
+        Login
+      </h2>
+
+      <p class="card-description">
+        Masukkan password administrator untuk
+        mengakses YasamGit.
       </p>
 
       <form id="loginForm">
 
-        <label>
+        <label for="password">
           Password
         </label>
 
         <input
           id="password"
           type="password"
+          placeholder="Masukkan password"
           autocomplete="current-password"
-          placeholder="Password admin"
           required
         >
 
         <button
           id="loginButton"
-          class="btn full"
-          style="margin-top:16px"
           type="submit"
         >
-          🔐 Login
+          Login
         </button>
 
       </form>
 
       <div
-        id="loginStatus"
-        class="status hidden"
+        id="loginMessage"
+        class="message"
       ></div>
 
-    </div>
-
-  </section>
+    </section>
 
 
-  <!-- APP -->
+    <!-- DASHBOARD -->
 
-  <section
-    id="appPage"
-    class="hidden"
-  >
-
-    <div class="topbar card">
-
-      <div>
-
-        <div class="logo">
-          📁 YasamGit
-        </div>
-
-        <div class="muted">
-          V5.2.0
-        </div>
-
-      </div>
-
-      <div class="actions">
-
-        <button
-          id="refreshRepos"
-          class="btn secondary"
-        >
-          🔄 Refresh
-        </button>
-
-        <button
-          id="logout"
-          class="btn danger"
-        >
-          🚪 Logout
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <!-- REPOS -->
-
-    <div class="card">
-
-      <div class="topbar">
-
-        <h2>
-          📚 Repository
-        </h2>
-
-        <button
-          id="createRepo"
-          class="btn success"
-        >
-          ➕ Buat Repo
-        </button>
-
-      </div>
-
-      <br>
-
-      <input
-        id="repoSearch"
-        placeholder="🔍 Cari repository..."
-      >
-
-      <div
-        id="repoList"
-        class="repo-grid"
-      ></div>
-
-    </div>
-
-
-    <!-- FILES -->
-
-    <div
-      id="fileSection"
-      class="card hidden"
+    <section
+      id="dashboardSection"
+      class="dashboard"
     >
 
-      <div class="topbar">
+      <div class="dashboard-header">
 
         <div>
-
           <h2>
-            📂 <span id="repoTitle"></span>
+            YasamGit Dashboard
           </h2>
-
-          <div
-            id="pathDisplay"
-            class="muted"
-          >
-            /
-          </div>
-
         </div>
 
         <button
-          id="backRepos"
-          class="btn secondary"
+          id="logoutButton"
+          class="logout"
+          type="button"
         >
-          ← Repository
+          Logout
         </button>
 
       </div>
 
-      <br>
 
-      <div class="actions">
+      <div class="grid">
 
-        <button
-          id="uploadButton"
-          class="btn"
-        >
-          📤 Upload
-        </button>
+        <div class="feature">
+          <h3>Repository</h3>
 
-        <button
-          id="folderButton"
-          class="btn secondary"
-        >
-          📁 Folder
-        </button>
+          <p>
+            Kelola repository dan informasi
+            project.
+          </p>
+        </div>
 
-        <button
-          id="refreshFiles"
-          class="btn secondary"
-        >
-          🔄 Refresh
-        </button>
+        <div class="feature">
+          <h3>Upload</h3>
+
+          <p>
+            Upload file binary maupun file biasa.
+          </p>
+        </div>
+
+        <div class="feature">
+          <h3>File Manager</h3>
+
+          <p>
+            Rename, edit, overwrite, dan delete
+            file.
+          </p>
+        </div>
+
+        <div class="feature">
+          <h3>Search</h3>
+
+          <p>
+            Cari repository dan file dengan cepat.
+          </p>
+        </div>
 
       </div>
 
-      <input
-        id="fileInput"
-        type="file"
-        multiple
-        class="hidden"
-      >
 
-      <div
-        id="fileList"
-        class="files"
-      ></div>
+      <div class="api-info">
 
-    </div>
+        <h3>
+          Backend Status
+        </h3>
 
-  </section>
+        <code id="apiStatus">
+          Checking...
+        </code>
 
-</div>
+      </div>
 
-
-<!-- MODAL -->
-
-<div
-  id="modal"
-  class="modal hidden"
->
-
-  <div class="modal-box">
-
-    <div class="topbar">
-
-      <h2 id="modalTitle">
-        YasamGit
-      </h2>
-
-      <button
-        id="closeModal"
-        class="btn secondary"
-      >
-        ✕
-      </button>
-
-    </div>
-
-    <div
-      id="modalContent"
-      style="margin-top:15px"
-    ></div>
+    </section>
 
   </div>
 
-</div>
+</main>
+
+
+<footer>
+  YasamGit Backend V5.2.0
+</footer>
 
 
 <script>
+  /*
+   * Karena frontend dan backend berada
+   * pada domain Vercel yang sama,
+   * gunakan relative API URL.
+   *
+   * Jangan menggunakan:
+   *
+   * https://yasam-git-backend.vercel.app/api
+   *
+   * sehingga tidak terjadi masalah
+   * CORS / Failed to fetch.
+   */
 
-const state = {
-  currentRepo: null,
-  currentPath: "",
-  repositories: []
-};
-
-const $ = id =>
-  document.getElementById(id);
+  const API = "/api";
 
 
-/* =========================
-   API
-========================= */
+  const loginSection =
+    document.getElementById(
+      "loginSection"
+    );
 
-async function api(
-  url,
-  options = {}
-) {
+  const dashboardSection =
+    document.getElementById(
+      "dashboardSection"
+    );
 
-  const response =
-    await fetch(
-      url,
-      {
-        credentials:
-          "same-origin",
+  const loginForm =
+    document.getElementById(
+      "loginForm"
+    );
 
-        ...options,
+  const passwordInput =
+    document.getElementById(
+      "password"
+    );
 
-        headers: {
-          ...(options.body
-            ? {
-                "Content-Type":
-                  "application/json"
-              }
-            : {}),
+  const loginButton =
+    document.getElementById(
+      "loginButton"
+    );
 
-          ...(options.headers || {})
-        }
+  const loginMessage =
+    document.getElementById(
+      "loginMessage"
+    );
+
+  const logoutButton =
+    document.getElementById(
+      "logoutButton"
+    );
+
+  const backendStatus =
+    document.getElementById(
+      "backendStatus"
+    );
+
+  const apiStatus =
+    document.getElementById(
+      "apiStatus"
+    );
+
+
+  function showMessage(
+    element,
+    message,
+    type
+  ) {
+
+    element.textContent =
+      message;
+
+    element.className =
+      "message show " + type;
+
+  }
+
+
+  function clearMessage(element) {
+
+    element.textContent =
+      "";
+
+    element.className =
+      "message";
+
+  }
+
+
+  async function checkBackend() {
+
+    try {
+
+      const response =
+        await fetch(
+          API + "/health",
+          {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store"
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (response.ok) {
+
+        backendStatus.textContent =
+          "Backend online";
+
+        apiStatus.textContent =
+          JSON.stringify(
+            data,
+            null,
+            2
+          );
+
+      } else {
+
+        backendStatus.textContent =
+          "Backend error";
+
+        apiStatus.textContent =
+          JSON.stringify(
+            data,
+            null,
+            2
+          );
+
       }
-    );
 
-  const text =
-    await response.text();
+    } catch (error) {
 
-  let data = {};
+      backendStatus.textContent =
+        "Backend tidak terhubung";
 
-  try {
-    data =
-      text
-        ? JSON.parse(text)
-        : {};
-  } catch {
-    data = {
-      ok: false,
-      error:
-        text ||
-        "Response tidak valid."
-    };
+      apiStatus.textContent =
+        error.message;
+
+    }
+
   }
 
-  if (!response.ok) {
 
-    throw new Error(
-      data.error ||
-      `HTTP ${response.status}`
-    );
+  async function checkSession() {
+
+    try {
+
+      const response =
+        await fetch(
+          API + "/session",
+          {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store"
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (
+        response.ok &&
+        data.authenticated === true
+      ) {
+
+        showDashboard();
+
+      } else {
+
+        showLogin();
+
+      }
+
+    } catch (error) {
+
+      showLogin();
+
+    }
+
   }
 
-  return data;
-}
+
+  function showLogin() {
+
+    loginSection.classList.remove(
+      "hidden"
+    );
+
+    dashboardSection.classList.remove(
+      "show"
+    );
+
+  }
 
 
-/* =========================
-   LOGIN
-========================= */
+  function showDashboard() {
 
-$("loginForm")
-  .addEventListener(
+    loginSection.classList.add(
+      "hidden"
+    );
+
+    dashboardSection.classList.add(
+      "show"
+    );
+
+  }
+
+
+  loginForm.addEventListener(
     "submit",
-    async event => {
+    async function(event) {
 
       event.preventDefault();
 
-      const button =
-        $("loginButton");
+      clearMessage(
+        loginMessage
+      );
 
       const password =
-        $("password")
-          .value
-          .trim();
+        passwordInput.value.trim();
+
 
       if (!password) {
+
+        showMessage(
+          loginMessage,
+          "Password wajib diisi.",
+          "error"
+        );
+
         return;
+
       }
 
-      button.disabled =
+
+      loginButton.disabled =
         true;
 
-      button.textContent =
-        "⏳ Login...";
+      loginButton.textContent =
+        "Login...";
+
 
       try {
 
-        const result =
-          await api(
-            "/api/login",
+        const response =
+          await fetch(
+            API + "/login",
             {
-              method:
-                "POST",
+              method: "POST",
+
+              credentials:
+                "include",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
 
               body:
                 JSON.stringify({
-                  password
+                  password:
+                    password
                 })
             }
           );
 
-        if (!result.ok) {
-          throw new Error(
-            result.error
-          );
+
+        let data;
+
+        try {
+
+          data =
+            await response.json();
+
+        } catch {
+
+          data = {
+            ok: false,
+            error:
+              "Response backend tidak valid."
+          };
+
         }
 
-        $("password").value =
-          "";
 
-        await checkSession();
+        if (
+          response.ok &&
+          data.ok
+        ) {
 
-      } catch(error) {
+          showMessage(
+            loginMessage,
+            "Login berhasil.",
+            "success"
+          );
 
-        showLoginStatus(
-          error.message ||
-          "Login gagal.",
-          false
+          passwordInput.value =
+            "";
+
+          setTimeout(
+            showDashboard,
+            300
+          );
+
+        } else {
+
+          showMessage(
+            loginMessage,
+            data.error ||
+              "Login gagal.",
+            "error"
+          );
+
+        }
+
+      } catch (error) {
+
+        showMessage(
+          loginMessage,
+          "Tidak bisa terhubung ke backend: " +
+            error.message,
+          "error"
         );
 
       } finally {
 
-        button.disabled =
+        loginButton.disabled =
           false;
 
-        button.textContent =
-          "🔐 Login";
+        loginButton.textContent =
+          "Login";
+
       }
+
     }
   );
 
 
-/* =========================
-   SESSION
-========================= */
-
-async function checkSession() {
-
-  try {
-
-    const result =
-      await api(
-        "/api/session"
-      );
-
-    if (
-      result.authenticated
-    ) {
-
-      $("loginPage")
-        .classList
-        .add("hidden");
-
-      $("appPage")
-        .classList
-        .remove("hidden");
-
-      await loadRepositories();
-
-    } else {
-
-      $("loginPage")
-        .classList
-        .remove("hidden");
-
-      $("appPage")
-        .classList
-        .add("hidden");
-    }
-
-  } catch(error) {
-
-    showLoginStatus(
-      "❌ Tidak bisa terhubung ke backend: " +
-      error.message,
-      false
-    );
-  }
-}
-
-
-/* =========================
-   LOGOUT
-========================= */
-
-$("logout")
-  .addEventListener(
+  logoutButton.addEventListener(
     "click",
-    async () => {
+    async function() {
 
       try {
 
-        await api(
-          "/api/logout",
+        await fetch(
+          API + "/logout",
           {
-            method:
-              "POST"
+            method: "POST",
+            credentials: "include"
           }
         );
 
-      } catch {}
+      } catch (error) {
 
-      state.currentRepo =
-        null;
+        console.error(
+          error
+        );
 
-      state.currentPath =
-        "";
+      }
 
-      $("fileSection")
-        .classList
-        .add("hidden");
+      showLogin();
 
-      $("appPage")
-        .classList
-        .add("hidden");
+      clearMessage(
+        loginMessage
+      );
 
-      $("loginPage")
-        .classList
-        .remove("hidden");
     }
   );
 
 
-/* =========================
-   REPOSITORIES
-========================= */
+  /*
+   * Jalankan pemeriksaan
+   * saat halaman dibuka.
+   */
 
-async function loadRepositories() {
+  checkBackend();
 
-  $("repoList")
-    .innerHTML =
-    `
-      <div class="empty">
-        ⏳ Memuat repository...
-      </div>
-    `;
-
-  try {
-
-    const result =
-      await api(
-        "/api/github?type=repos"
-      );
-
-    state.repositories =
-      Array.isArray(
-        result.repositories
-      )
-        ? result.repositories
-        : [];
-
-    renderRepositories();
-
-  } catch(error) {
-
-    $("repoList")
-      .innerHTML =
-      `
-        <div class="empty">
-          ❌ ${escapeHtml(
-            error.message
-          )}
-        </div>
-      `;
-  }
-}
-
-
-function renderRepositories() {
-
-  const search =
-    $("repoSearch")
-      .value
-      .trim()
-      .toLowerCase();
-
-  const repos =
-    state.repositories
-      .filter(
-        repo =>
-          String(
-            repo.name ||
-            ""
-          )
-          .toLowerCase()
-          .includes(search)
-      );
-
-  if (!repos.length) {
-
-    $("repoList")
-      .innerHTML =
-      `
-        <div class="empty">
-          📁 Repository tidak ditemukan.
-        </div>
-      `;
-
-    return;
-  }
-
-  $("repoList")
-    .innerHTML =
-    repos
-      .map(
-        repo => `
-          <div class="repo">
-
-            <div class="repo-name">
-              📁 ${escapeHtml(
-                repo.name
-              )}
-            </div>
-
-            <div class="repo-desc">
-              ${escapeHtml(
-                repo.description ||
-                "Tidak ada deskripsi."
-              )}
-            </div>
-
-            <button
-              class="btn"
-              data-open-repo="${escapeHtml(
-                repo.name
-              )}"
-            >
-              📂 Buka
-            </button>
-
-          </div>
-        `
-      )
-      .join("");
-
-  document
-    .querySelectorAll(
-      "[data-open-repo]"
-    )
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            openRepository(
-              button.dataset
-                .openRepo
-            );
-          }
-        );
-      }
-    );
-}
-
-
-$("repoSearch")
-  .addEventListener(
-    "input",
-    renderRepositories
-  );
-
-
-$("refreshRepos")
-  .addEventListener(
-    "click",
-    loadRepositories
-  );
-
-
-/* =========================
-   OPEN REPO
-========================= */
-
-async function openRepository(
-  name
-) {
-
-  state.currentRepo =
-    name;
-
-  state.currentPath =
-    "";
-
-  $("repoTitle")
-    .textContent =
-    name;
-
-  $("fileSection")
-    .classList
-    .remove("hidden");
-
-  await loadFiles();
-}
-
-
-/* =========================
-   FILES
-========================= */
-
-async function loadFiles() {
-
-  if (!state.currentRepo) {
-    return;
-  }
-
-  $("pathDisplay")
-    .textContent =
-    "/" +
-    state.currentPath;
-
-  $("fileList")
-    .innerHTML =
-    `
-      <div class="empty">
-        ⏳ Memuat file...
-      </div>
-    `;
-
-  try {
-
-    const params =
-      new URLSearchParams({
-        action:
-          "list",
-
-        repo:
-          state.currentRepo,
-
-        path:
-          state.currentPath
-      });
-
-    const result =
-      await api(
-        "/api/file?" +
-        params.toString()
-      );
-
-    renderFiles(
-      result.files || []
-    );
-
-  } catch(error) {
-
-    $("fileList")
-      .innerHTML =
-      `
-        <div class="empty">
-          ❌ ${escapeHtml(
-            error.message
-          )}
-        </div>
-      `;
-  }
-}
-
-
-function renderFiles(
-  files
-) {
-
-  if (!files.length) {
-
-    $("fileList")
-      .innerHTML =
-      `
-        <div class="empty">
-          📂 Folder kosong.
-        </div>
-      `;
-
-    return;
-  }
-
-  $("fileList")
-    .innerHTML =
-    files
-      .map(
-        file => {
-
-          const folder =
-            file.type ===
-            "dir";
-
-          return `
-            <div class="file">
-
-              <div style="flex:1">
-
-                <div
-                  class="file-name"
-                  data-open-path="${escapeHtml(
-                    file.path
-                  )}"
-                  data-type="${folder
-                    ? "dir"
-                    : "file"}"
-                >
-                  ${
-                    folder
-                      ? "📁"
-                      : icon(file.name)
-                  }
-                  ${escapeHtml(
-                    file.name
-                  )}
-                </div>
-
-                <div class="file-meta">
-                  ${
-                    folder
-                      ? "Folder"
-                      : formatBytes(
-                          file.size ||
-                          0
-                        )
-                  }
-                </div>
-
-              </div>
-
-              <div class="file-actions">
-
-                ${
-                  !folder
-                    ? `
-                      <button
-                        class="small"
-                        data-action="preview"
-                        data-path="${escapeHtml(
-                          file.path
-                        )}"
-                      >
-                        👁️
-                      </button>
-
-                      <button
-                        class="small"
-                        data-action="download"
-                        data-path="${escapeHtml(
-                          file.path
-                        )}"
-                      >
-                        ⬇️
-                      </button>
-
-                      <button
-                        class="small"
-                        data-action="edit"
-                        data-path="${escapeHtml(
-                          file.path
-                        )}"
-                      >
-                        ✏️
-                      </button>
-                    `
-                    : ""
-                }
-
-                <button
-                  class="small"
-                  data-action="rename"
-                  data-path="${escapeHtml(
-                    file.path
-                  )}"
-                  data-name="${escapeHtml(
-                    file.name
-                  )}"
-                >
-                  ✏️
-                </button>
-
-                <button
-                  class="small small-danger"
-                  data-action="delete"
-                  data-path="${escapeHtml(
-                    file.path
-                  )}"
-                >
-                  🗑️
-                </button>
-
-              </div>
-
-            </div>
-          `;
-        }
-      )
-      .join("");
-
-  attachFileEvents();
-}
-
-
-function attachFileEvents() {
-
-  document
-    .querySelectorAll(
-      "[data-open-path]"
-    )
-    .forEach(
-      element => {
-
-        element.addEventListener(
-          "click",
-          () => {
-
-            const path =
-              element.dataset
-                .openPath;
-
-            if (
-              element.dataset.type ===
-              "dir"
-            ) {
-
-              state.currentPath =
-                path;
-
-              loadFiles();
-
-            } else {
-
-              previewFile(
-                path
-              );
-            }
-          }
-        );
-      }
-    );
-
-
-  document
-    .querySelectorAll(
-      "[data-action]"
-    )
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          event => {
-
-            event.stopPropagation();
-
-            const action =
-              button.dataset
-                .action;
-
-            const path =
-              button.dataset
-                .path;
-
-            if (
-              action ===
-              "preview"
-            ) {
-              previewFile(path);
-            }
-
-            if (
-              action ===
-              "download"
-            ) {
-              downloadFile(path);
-            }
-
-            if (
-              action ===
-              "edit"
-            ) {
-              editFile(path);
-            }
-
-            if (
-              action ===
-              "rename"
-            ) {
-              renameFile(
-                path,
-                button.dataset
-                  .name
-              );
-            }
-
-            if (
-              action ===
-              "delete"
-            ) {
-              deleteFile(path);
-            }
-          }
-        );
-      }
-    );
-}
-
-
-/* =========================
-   UPLOAD
-========================= */
-
-$("uploadButton")
-  .addEventListener(
-    "click",
-    () =>
-      $("fileInput").click()
-  );
-
-
-$("fileInput")
-  .addEventListener(
-    "change",
-    async () => {
-
-      const files =
-        Array.from(
-          $("fileInput").files
-        );
-
-      for (
-        const file of files
-      ) {
-
-        try {
-
-          const buffer =
-            await file
-              .arrayBuffer();
-
-          const bytes =
-            new Uint8Array(
-              buffer
-            );
-
-          let binary = "";
-
-          const chunk =
-            0x8000;
-
-          for (
-            let i = 0;
-            i < bytes.length;
-            i += chunk
-          ) {
-
-            binary +=
-              String.fromCharCode(
-                ...bytes.subarray(
-                  i,
-                  i + chunk
-                )
-              );
-          }
-
-          const base64 =
-            btoa(binary);
-
-          const path =
-            state.currentPath
-              ? state.currentPath +
-                "/" +
-                file.name
-              : file.name;
-
-          await api(
-            "/api/file",
-            {
-              method:
-                "POST",
-
-              body:
-                JSON.stringify({
-                  action:
-                    "upload",
-
-                  repo:
-                    state.currentRepo,
-
-                  path,
-
-                  content:
-                    base64,
-
-                  encoding:
-                    "base64",
-
-                  message:
-                    `Upload ${file.name}`
-                })
-            }
-          );
-
-        } catch(error) {
-
-          alert(
-            `Upload gagal:\n${error.message}`
-          );
-        }
-      }
-
-      $("fileInput").value =
-        "";
-
-      await loadFiles();
-    }
-  );
-
-
-/* =========================
-   FOLDER
-========================= */
-
-$("folderButton")
-  .addEventListener(
-    "click",
-    async () => {
-
-      const name =
-        prompt(
-          "Nama folder:"
-        );
-
-      if (!name) {
-        return;
-      }
-
-      const path =
-        state.currentPath
-          ? `${state.currentPath}/${name}/.gitkeep`
-          : `${name}/.gitkeep`;
-
-      try {
-
-        await api(
-          "/api/file",
-          {
-            method:
-              "POST",
-
-            body:
-              JSON.stringify({
-                action:
-                  "upload",
-
-                repo:
-                  state.currentRepo,
-
-                path,
-
-                content:
-                  "",
-
-                encoding:
-                  "utf8",
-
-                message:
-                  `Create folder ${name}`
-              })
-          }
-        );
-
-        await loadFiles();
-
-      } catch(error) {
-
-        alert(
-          error.message
-        );
-      }
-    }
-  );
-
-
-/* =========================
-   PREVIEW
-========================= */
-
-async function previewFile(
-  path
-) {
-
-  openModal(
-    "👁️ Preview",
-    `
-      <div class="empty">
-        ⏳ Loading...
-      </div>
-    `
-  );
-
-  try {
-
-    const result =
-      await api(
-        "/api/file?" +
-        new URLSearchParams({
-          action:
-            "read",
-
-          repo:
-            state.currentRepo,
-
-          path
-        }).toString()
-      );
-
-    if (
-      result.dataUrl
-    ) {
-
-      modalContent.innerHTML =
-        `
-          <img
-            class="preview"
-            src="${result.dataUrl}"
-            alt=""
-          >
-        `;
-
-      return;
-    }
-
-    $("modalContent")
-      .innerHTML =
-      `
-        <pre>${escapeHtml(
-          result.content ||
-          ""
-        )}</pre>
-      `;
-
-  } catch(error) {
-
-    $("modalContent")
-      .innerHTML =
-      `
-        <div class="status error">
-          ❌ ${escapeHtml(
-            error.message
-          )}
-        </div>
-      `;
-  }
-}
-
-
-/* =========================
-   EDIT
-========================= */
-
-async function editFile(
-  path
-) {
-
-  openModal(
-    "✏️ Edit",
-    `
-      <textarea
-        id="editor"
-      ></textarea>
-
-      <br><br>
-
-      <button
-        id="saveEditor"
-        class="btn success"
-      >
-        💾 Simpan
-      </button>
-    `
-  );
-
-  try {
-
-    const result =
-      await api(
-        "/api/file?" +
-        new URLSearchParams({
-          action:
-            "read",
-
-          repo:
-            state.currentRepo,
-
-          path
-        }).toString()
-      );
-
-    $("editor").value =
-      result.content ||
-      "";
-
-    $("saveEditor")
-      .addEventListener(
-        "click",
-        async () => {
-
-          try {
-
-            await api(
-              "/api/file",
-              {
-                method:
-                  "POST",
-
-                body:
-                  JSON.stringify({
-                    action:
-                      "overwrite",
-
-                    repo:
-                      state.currentRepo,
-
-                    path,
-
-                    content:
-                      $("editor")
-                        .value,
-
-                    encoding:
-                      "utf8",
-
-                    sha:
-                      result.sha,
-
-                    message:
-                      `Edit ${path}`
-                  })
-              }
-            );
-
-            closeModal();
-
-            await loadFiles();
-
-          } catch(error) {
-
-            alert(
-              error.message
-            );
-          }
-        }
-      );
-
-  } catch(error) {
-
-    $("modalContent")
-      .innerHTML =
-      `
-        <div class="status error">
-          ❌ ${escapeHtml(
-            error.message
-          )}
-        </div>
-      `;
-  }
-}
-
-
-/* =========================
-   DOWNLOAD
-========================= */
-
-async function downloadFile(
-  path
-) {
-
-  try {
-
-    const response =
-      await fetch(
-        "/api/file?" +
-        new URLSearchParams({
-          action:
-            "download",
-
-          repo:
-            state.currentRepo,
-
-          path
-        }),
-        {
-          credentials:
-            "same-origin"
-        }
-      );
-
-    if (!response.ok) {
-
-      const text =
-        await response.text();
-
-      throw new Error(
-        text ||
-        "Download gagal."
-      );
-    }
-
-    const blob =
-      await response.blob();
-
-    const url =
-      URL.createObjectURL(
-        blob
-      );
-
-    const link =
-      document.createElement(
-        "a"
-      );
-
-    link.href =
-      url;
-
-    link.download =
-      path
-        .split("/")
-        .pop();
-
-    document.body.appendChild(
-      link
-    );
-
-    link.click();
-
-    link.remove();
-
-    URL.revokeObjectURL(
-      url
-    );
-
-  } catch(error) {
-
-    alert(
-      error.message
-    );
-  }
-}
-
-
-/* =========================
-   RENAME
-========================= */
-
-async function renameFile(
-  oldPath,
-  oldName
-) {
-
-  const newName =
-    prompt(
-      "Nama baru:",
-      oldName
-    );
-
-  if (
-    !newName ||
-    newName === oldName
-  ) {
-    return;
-  }
-
-  const parts =
-    oldPath.split("/");
-
-  parts.pop();
-
-  const parent =
-    parts.join("/");
-
-  const newPath =
-    parent
-      ? `${parent}/${newName}`
-      : newName;
-
-  try {
-
-    await api(
-      "/api/file",
-      {
-        method:
-          "POST",
-
-        body:
-          JSON.stringify({
-            action:
-              "rename",
-
-            repo:
-              state.currentRepo,
-
-            oldPath,
-
-            newPath,
-
-            message:
-              `Rename ${oldPath}`
-          })
-      }
-    );
-
-    await loadFiles();
-
-  } catch(error) {
-
-    alert(
-      error.message
-    );
-  }
-}
-
-
-/* =========================
-   DELETE
-========================= */
-
-async function deleteFile(
-  path
-) {
-
-  if (
-    !confirm(
-      `Hapus?\n\n${path}`
-    )
-  ) {
-    return;
-  }
-
-  try {
-
-    await api(
-      "/api/file",
-      {
-        method:
-          "POST",
-
-        body:
-          JSON.stringify({
-            action:
-              "delete",
-
-            repo:
-              state.currentRepo,
-
-            path,
-
-            message:
-              `Delete ${path}`
-          })
-      }
-    );
-
-    await loadFiles();
-
-  } catch(error) {
-
-    alert(
-      error.message
-    );
-  }
-}
-
-
-/* =========================
-   CREATE REPO
-========================= */
-
-$("createRepo")
-  .addEventListener(
-    "click",
-    async () => {
-
-      const name =
-        prompt(
-          "Nama repository:"
-        );
-
-      if (!name) {
-        return;
-      }
-
-      const description =
-        prompt(
-          "Deskripsi:",
-          ""
-        ) || "";
-
-      try {
-
-        await api(
-          "/api/github",
-          {
-            method:
-              "POST",
-
-            body:
-              JSON.stringify({
-                action:
-                  "createRepo",
-
-                name,
-
-                description
-              })
-          }
-        );
-
-        await loadRepositories();
-
-      } catch(error) {
-
-        alert(
-          error.message
-        );
-      }
-    }
-  );
-
-
-/* =========================
-   REFRESH FILES
-========================= */
-
-$("refreshFiles")
-  .addEventListener(
-    "click",
-    loadFiles
-  );
-
-
-$("backRepos")
-  .addEventListener(
-    "click",
-    () => {
-
-      state.currentRepo =
-        null;
-
-      state.currentPath =
-        "";
-
-      $("fileSection")
-        .classList
-        .add("hidden");
-    }
-  );
-
-
-/* =========================
-   MODAL
-========================= */
-
-function openModal(
-  title,
-  content
-) {
-
-  $("modalTitle")
-    .textContent =
-    title;
-
-  $("modalContent")
-    .innerHTML =
-    content;
-
-  $("modal")
-    .classList
-    .remove("hidden");
-}
-
-
-function closeModal() {
-
-  $("modal")
-    .classList
-    .add("hidden");
-}
-
-
-$("closeModal")
-  .addEventListener(
-    "click",
-    closeModal
-  );
-
-
-$("modal")
-  .addEventListener(
-    "click",
-    event => {
-
-      if (
-        event.target ===
-        $("modal")
-      ) {
-        closeModal();
-      }
-    }
-  );
-
-
-/* =========================
-   HELPERS
-========================= */
-
-function showLoginStatus(
-  message,
-  success
-) {
-
-  $("loginStatus")
-    .textContent =
-    message;
-
-  $("loginStatus")
-    .className =
-    "status " +
-    (
-      success
-        ? "ok"
-        : "error"
-    );
-}
-
-
-function escapeHtml(
-  value
-) {
-
-  return String(
-    value ?? ""
-  )
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-}
-
-
-function formatBytes(
-  bytes
-) {
-
-  if (!bytes) {
-    return "0 B";
-  }
-
-  const units = [
-    "B",
-    "KB",
-    "MB",
-    "GB"
-  ];
-
-  let value =
-    Number(bytes);
-
-  let i = 0;
-
-  while (
-    value >= 1024 &&
-    i <
-      units.length - 1
-  ) {
-
-    value /= 1024;
-    i++;
-  }
-
-  return (
-    value.toFixed(
-      i ? 1 : 0
-    ) +
-    " " +
-    units[i]
-  );
-}
-
-
-function icon(name) {
-
-  const ext =
-    String(name)
-      .split(".")
-      .pop()
-      .toLowerCase();
-
-  if (
-    [
-      "png",
-      "jpg",
-      "jpeg",
-      "gif",
-      "webp",
-      "svg"
-    ].includes(ext)
-  ) {
-    return "🖼️";
-  }
-
-  if (
-    [
-      "mp4",
-      "webm",
-      "mov"
-    ].includes(ext)
-  ) {
-    return "🎬";
-  }
-
-  if (
-    [
-      "js",
-      "ts",
-      "html",
-      "css",
-      "json",
-      "php",
-      "py"
-    ].includes(ext)
-  ) {
-    return "💻";
-  }
-
-  return "📄";
-}
-
-
-/* =========================
-   START
-========================= */
-
-checkSession();
+  checkSession();
 
 </script>
 
