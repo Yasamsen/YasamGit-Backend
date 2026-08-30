@@ -1,11 +1,22 @@
 const {
+  method,
   json
 } = require("../lib/response");
 
 module.exports =
   function handler(req, res) {
 
-    return json(
+    if (
+      !method(
+        req,
+        res,
+        ["GET"]
+      )
+    ) {
+      return;
+    }
+
+    json(
       req,
       res,
       200,
