@@ -8,15 +8,33 @@ const {
 } = require("../lib/auth");
 
 module.exports = function handler(req, res) {
+
+  // Hanya menerima GET
   if (!method(req, res, ["GET"])) {
     return;
   }
 
-  const authenticated =
-    isAuthenticated(req);
+  try {
 
-  json(res, 200, {
-    ok: true,
-    authenticated
-  });
+    const authenticated =
+      isAuthenticated(req);
+
+    return json(req, res, 200, {
+      ok: true,
+      authenticated
+    });
+
+  } catch (error) {
+
+    console.error(
+      "SESSION_ERROR:",
+      error
+    );
+
+    return json(req, res, 500, {
+      ok: false,
+      authenticated: false,
+      error: "Gagal memeriksa session."
+    });
+  }
 };
