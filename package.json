@@ -2,7 +2,8 @@
   "name": "yasamgit-backend",
   "version": "5.2.0",
   "private": true,
+  "description": "YasamGit V5.2 Backend",
   "engines": {
-    "node": "22.x"
+    "node": "20.x"
   }
 }
