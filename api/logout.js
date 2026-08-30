@@ -7,19 +7,35 @@ const {
   clearSessionCookie
 } = require("../lib/auth");
 
-module.exports = function handler(req, res) {
-  if (!method(req, res, ["POST"])) {
-    return;
-  }
+module.exports =
+  function handler(
+    req,
+    res
+  ) {
 
-  res.setHeader(
-    "Set-Cookie",
-    clearSessionCookie()
-  );
+    if (
+      !method(
+        req,
+        res,
+        ["POST"]
+      )
+    ) {
+      return;
+    }
 
-  json(res, 200, {
-    ok: true,
-    message:
-      "Logout berhasil."
-  });
-};
+    res.setHeader(
+      "Set-Cookie",
+      clearSessionCookie()
+    );
+
+    return json(
+      req,
+      res,
+      200,
+      {
+        ok: true,
+        message:
+          "Logout berhasil."
+      }
+    );
+  };
