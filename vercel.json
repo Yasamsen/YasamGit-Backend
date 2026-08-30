@@ -1,14 +1,9 @@
 {
   "version": 2,
+  "cleanUrls": true,
   "functions": {
-    "api/index.js": {
-      "maxDuration": 30
+    "api/**/*.js": {
+      "runtime": "nodejs22.x"
     }
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js"
-    }
-  ]
+  }
 }
