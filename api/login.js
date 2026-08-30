@@ -58,103 +58,81 @@ module.exports =
       );
     }
 
-    try {
+    const data =
+      await body(req);
 
-      const data =
-        await body(req);
-
-      const password =
-        String(
-          data.password || ""
-        );
-
-      if (!password) {
-        return json(
-          req,
-          res,
-          400,
-          {
-            ok: false,
-            error:
-              "Password wajib diisi."
-          }
-        );
-      }
-
-      const input =
-        Buffer.from(password);
-
-      const saved =
-        Buffer.from(
-          String(
-            process.env
-              .ADMIN_PASSWORD
-          )
-        );
-
-      let valid = false;
-
-      if (
-        input.length ===
-        saved.length
-      ) {
-        valid =
-          crypto.timingSafeEqual(
-            input,
-            saved
-          );
-      }
-
-      if (!valid) {
-        return json(
-          req,
-          res,
-          401,
-          {
-            ok: false,
-            error:
-              "Password salah."
-          }
-        );
-      }
-
-      const token =
-        createSession();
-
-      res.setHeader(
-        "Set-Cookie",
-        sessionCookie(token)
+    const password =
+      String(
+        data.password || ""
       );
 
+    if (!password) {
       return json(
         req,
         res,
-        200,
-        {
-          ok: true,
-          message:
-            "Login berhasil.",
-          expiresIn:
-            86400
-        }
-      );
-
-    } catch (error) {
-
-      console.error(
-        "LOGIN_ERROR:",
-        error
-      );
-
-      return json(
-        req,
-        res,
-        500,
+        400,
         {
           ok: false,
           error:
-            "Terjadi kesalahan server."
+            "Password wajib diisi."
         }
       );
     }
+
+    const input =
+      Buffer.from(password);
+
+    const saved =
+      Buffer.from(
+        String(
+          process.env.ADMIN_PASSWORD
+        )
+      );
+
+    let valid = false;
+
+    if (
+      input.length ===
+      saved.length
+    ) {
+      valid =
+        crypto.timingSafeEqual(
+          input,
+          saved
+        );
+    }
+
+    if (!valid) {
+      return json(
+        req,
+        res,
+        401,
+        {
+          ok: false,
+          error:
+            "Password salah."
+        }
+      );
+    }
+
+    const token =
+      createSession();
+
+    res.setHeader(
+      "Set-Cookie",
+      sessionCookie(token)
+    );
+
+    return json(
+      req,
+      res,
+      200,
+      {
+        ok: true,
+        message:
+          "Login berhasil.",
+        expiresIn:
+          86400
+      }
+    );
   };
