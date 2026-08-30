@@ -1,17 +1,7 @@
-const {
-  method,
-  json
-} = require("../lib/response");
-
-module.exports = function handler(req, res) {
-  if (!method(req, res, ["GET"])) {
-    return;
-  }
-
-  json(res, 200, {
+module.exports = (req, res) => {
+  res.status(200).json({
     ok: true,
-    service:
-      "YasamGit Backend",
+    service: "YasamGit Backend",
     version: "5.2.0",
     status: "online"
   });
