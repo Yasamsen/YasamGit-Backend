@@ -1,19 +1,11 @@
 const crypto = require("crypto");
 
 const GITHUB_API = "https://api.github.com";
-const GITHUB_API_VERSION = "2022-11-28";
-
-/*
-|--------------------------------------------------------------------------
-| Helpers
-|--------------------------------------------------------------------------
-*/
+const API_VERSION = "2022-11-28";
 
 function corsHeaders() {
-  const origin = process.env.FRONTEND_ORIGIN || "*";
-
   return {
-    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Origin": process.env.FRONTEND_ORIGIN || "*",
     "Access-Control-Allow-Credentials": "true",
     "Access-Control-Allow-Methods":
       "GET,POST,PUT,DELETE,OPTIONS",
@@ -23,130 +15,116 @@ function corsHeaders() {
   };
 }
 
-function send(res, status, data, extraHeaders = {}) {
-  res.statusCode = status;
-
-  const headers = {
-    ...corsHeaders(),
-    "Content-Type":
-      "application/json; charset=utf-8",
-    ...extraHeaders
+function json(data, status = 200, extra = {}) {
+  return {
+    status,
+    headers: {
+      ...corsHeaders(),
+      "Content-Type": "application/json; charset=utf-8",
+      ...extra
+    },
+    body: JSON.stringify(data)
   };
-
-  for (const [key, value] of Object.entries(headers)) {
-    res.setHeader(key, value);
-  }
-
-  res.end(JSON.stringify(data));
 }
 
-function getCookie(req, name) {
-  const cookieHeader =
-    req.headers.cookie || "";
+function randomId(bytes = 32) {
+  return crypto.randomBytes(bytes).toString("hex");
+}
 
-  const cookies =
-    cookieHeader
-      .split(";")
-      .map(x => x.trim());
+function base64url(input) {
+  return Buffer.from(input)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
 
-  for (const cookie of cookies) {
-    const index = cookie.indexOf("=");
+function fromBase64url(input) {
+  input = input
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
 
-    if (index === -1) continue;
+  while (input.length % 4) {
+    input += "=";
+  }
 
-    const key =
-      cookie.slice(0, index);
+  return Buffer.from(input, "base64").toString();
+}
 
-    const value =
-      cookie.slice(index + 1);
+function sign(value) {
+  return base64url(
+    crypto
+      .createHmac(
+        "sha256",
+        process.env.SESSION_SECRET
+      )
+      .update(value)
+      .digest()
+  );
+}
+
+function createSession() {
+  const payload = {
+    iat: Date.now(),
+    exp: Date.now() + 24 * 60 * 60 * 1000,
+    id: randomId(16)
+  };
+
+  const data = base64url(
+    JSON.stringify(payload)
+  );
+
+  const signature = sign(data);
+
+  return `${data}.${signature}`;
+}
+
+function getCookie(request, name) {
+  const cookie = request.headers.cookie || "";
+
+  const parts = cookie.split(";");
+
+  for (const part of parts) {
+    const [key, ...rest] =
+      part.trim().split("=");
 
     if (key === name) {
-      return decodeURIComponent(value);
+      return decodeURIComponent(
+        rest.join("=")
+      );
     }
   }
 
   return null;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Session
-|--------------------------------------------------------------------------
-*/
+function verifySession(session) {
+  if (!session) return null;
 
-function createSession() {
-  const payload = {
-    id: crypto.randomBytes(16).toString("hex"),
-    iat: Date.now(),
-    exp:
-      Date.now() +
-      24 * 60 * 60 * 1000
-  };
-
-  const data =
-    Buffer.from(
-      JSON.stringify(payload)
-    ).toString("base64url");
-
-  const signature =
-    crypto
-      .createHmac(
-        "sha256",
-        process.env.SESSION_SECRET
-      )
-      .update(data)
-      .digest("base64url");
-
-  return `${data}.${signature}`;
-}
-
-function verifySession(token) {
-  if (!token) return null;
-
-  const parts =
-    token.split(".");
+  const parts = session.split(".");
 
   if (parts.length !== 2) {
     return null;
   }
 
-  const [data, signature] =
-    parts;
+  const [data, signature] = parts;
 
-  const expected =
-    crypto
-      .createHmac(
-        "sha256",
-        process.env.SESSION_SECRET
-      )
-      .update(data)
-      .digest("base64url");
+  const expected = sign(data);
 
-  try {
-    const a =
-      Buffer.from(signature);
+  const a = Buffer.from(signature);
+  const b = Buffer.from(expected);
 
-    const b =
-      Buffer.from(expected);
-
-    if (
-      a.length !== b.length ||
-      !crypto.timingSafeEqual(a, b)
-    ) {
-      return null;
-    }
-  } catch {
+  if (
+    a.length !== b.length ||
+    !crypto.timingSafeEqual(a, b)
+  ) {
     return null;
   }
 
   try {
-    const payload =
-      JSON.parse(
-        Buffer.from(
-          data,
-          "base64url"
-        ).toString("utf8")
-      );
+    const payload = JSON.parse(
+      fromBase64url(data)
+    );
 
     if (
       !payload.exp ||
@@ -156,43 +134,39 @@ function verifySession(token) {
     }
 
     return payload;
-
   } catch {
     return null;
   }
 }
 
-function getSession(req) {
-  return verifySession(
-    getCookie(
-      req,
-      "yasamgit_session"
-    )
+function getSession(request) {
+  const cookie = getCookie(
+    request,
+    "yasamgit_session"
   );
+
+  return verifySession(cookie);
 }
 
-function requireSession(req, res) {
-  const session =
-    getSession(req);
-
-  if (!session) {
-    send(res, 401, {
-      ok: false,
-      error:
-        "Session tidak valid atau sudah expired."
-    });
-
-    return null;
+function requireEnvironment() {
+  if (!process.env.GITHUB_TOKEN) {
+    throw new Error(
+      "GITHUB_TOKEN belum diset."
+    );
   }
 
-  return session;
-}
+  if (!process.env.ADMIN_PASSWORD) {
+    throw new Error(
+      "ADMIN_PASSWORD belum diset."
+    );
+  }
 
-/*
-|--------------------------------------------------------------------------
-| GitHub
-|--------------------------------------------------------------------------
-*/
+  if (!process.env.SESSION_SECRET) {
+    throw new Error(
+      "SESSION_SECRET belum diset."
+    );
+  }
+}
 
 function githubHeaders() {
   return {
@@ -200,7 +174,7 @@ function githubHeaders() {
       "application/vnd.github+json",
 
     "X-GitHub-Api-Version":
-      GITHUB_API_VERSION,
+      API_VERSION,
 
     "User-Agent":
       "YasamGit-V5.2",
@@ -210,22 +184,18 @@ function githubHeaders() {
   };
 }
 
-async function github(
-  endpoint,
-  options = {}
-) {
-  const response =
-    await fetch(
-      GITHUB_API + endpoint,
-      {
-        ...options,
+async function github(path, options = {}) {
+  const response = await fetch(
+    GITHUB_API + path,
+    {
+      ...options,
 
-        headers: {
-          ...githubHeaders(),
-          ...(options.headers || {})
-        }
+      headers: {
+        ...githubHeaders(),
+        ...(options.headers || {})
       }
-    );
+    }
+  );
 
   const text =
     await response.text();
@@ -233,14 +203,9 @@ async function github(
   let data;
 
   try {
-    data =
-      text
-        ? JSON.parse(text)
-        : {};
+    data = JSON.parse(text);
   } catch {
-    data = {
-      message: text
-    };
+    data = text;
   }
 
   return {
@@ -249,328 +214,194 @@ async function github(
   };
 }
 
+async function readBody(request) {
+  try {
+    return await request.json();
+  } catch {
+    return {};
+  }
+}
+
 function encodePath(path) {
   return String(path || "")
     .split("/")
     .filter(Boolean)
-    .map(
-      part =>
-        encodeURIComponent(part)
-    )
+    .map(encodeURIComponent)
     .join("/");
 }
 
 function repoPath(owner, repo) {
   return (
-    `/repos/` +
-    `${encodeURIComponent(owner)}/` +
-    `${encodeURIComponent(repo)}`
+    `/repos/${encodeURIComponent(owner)}` +
+    `/${encodeURIComponent(repo)}`
   );
 }
 
-async function readBody(req) {
-  if (
-    req.body &&
-    typeof req.body === "object"
-  ) {
-    return req.body;
-  }
+/* =========================
+   LOGIN
+========================= */
 
-  return new Promise(
-    resolve => {
-      let body = "";
+async function login(request) {
+  requireEnvironment();
 
-      req.on(
-        "data",
-        chunk => {
-          body += chunk;
-        }
-      );
-
-      req.on(
-        "end",
-        () => {
-          try {
-            resolve(
-              body
-                ? JSON.parse(body)
-                : {}
-            );
-          } catch {
-            resolve({});
-          }
-        }
-      );
-
-      req.on(
-        "error",
-        () => resolve({})
-      );
-    }
-  );
-}
-
-/*
-|--------------------------------------------------------------------------
-| HEALTH
-|--------------------------------------------------------------------------
-*/
-
-async function health(req, res) {
-  send(res, 200, {
-    ok: true,
-    service:
-      "YasamGit Backend",
-    version: "5.2.0",
-    status: "online"
-  });
-}
-
-/*
-|--------------------------------------------------------------------------
-| LOGIN
-|--------------------------------------------------------------------------
-*/
-
-async function login(req, res) {
-  if (
-    !process.env.ADMIN_PASSWORD
-  ) {
-    return send(res, 500, {
-      ok: false,
-      error:
-        "ADMIN_PASSWORD belum diset di Vercel."
-    });
-  }
-
-  if (
-    !process.env.SESSION_SECRET
-  ) {
-    return send(res, 500, {
-      ok: false,
-      error:
-        "SESSION_SECRET belum diset di Vercel."
-    });
-  }
-
-  const body =
-    await readBody(req);
+  const data =
+    await readBody(request);
 
   const password =
-    String(body.password || "");
+    String(data.password || "");
 
   if (!password) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "Password wajib diisi."
-    });
-  }
-
-  const input =
-    Buffer.from(password);
-
-  const stored =
-    Buffer.from(
-      String(
-        process.env.ADMIN_PASSWORD
-      )
+    return json(
+      {
+        ok: false,
+        error: "Password wajib diisi."
+      },
+      400
     );
-
-  let valid = false;
+  }
 
   if (
-    input.length === stored.length
+    !crypto.timingSafeEqual(
+      Buffer.from(password),
+      Buffer.from(
+        process.env.ADMIN_PASSWORD
+      )
+    )
   ) {
-    valid =
-      crypto.timingSafeEqual(
-        input,
-        stored
-      );
-  }
-
-  if (!valid) {
-    return send(res, 401, {
-      ok: false,
-      error:
-        "Password salah."
-    });
+    return json(
+      {
+        ok: false,
+        error: "Password salah."
+      },
+      401
+    );
   }
 
   const session =
     createSession();
 
-  send(
-    res,
-    200,
+  return json(
     {
       ok: true,
-      message:
-        "Login berhasil.",
-      expiresIn:
-        24 * 60 * 60
+      message: "Login berhasil.",
+      expiresIn: 86400
     },
+    200,
     {
       "Set-Cookie":
         `yasamgit_session=${encodeURIComponent(session)}; ` +
-        `HttpOnly; ` +
-        `Secure; ` +
-        `SameSite=None; ` +
-        `Path=/; ` +
-        `Max-Age=86400`
+        "HttpOnly; Secure; SameSite=None; Path=/; Max-Age=86400"
     }
   );
 }
 
-/*
-|--------------------------------------------------------------------------
-| LOGOUT
-|--------------------------------------------------------------------------
-*/
-
-async function logout(req, res) {
-  send(
-    res,
-    200,
+async function logout() {
+  return json(
     {
-      ok: true,
-      message:
-        "Logout berhasil."
+      ok: true
     },
+    200,
     {
       "Set-Cookie":
         "yasamgit_session=; " +
-        "HttpOnly; " +
-        "Secure; " +
-        "SameSite=None; " +
-        "Path=/; " +
-        "Max-Age=0"
+        "HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0"
     }
   );
 }
 
-/*
-|--------------------------------------------------------------------------
-| SESSION
-|--------------------------------------------------------------------------
-*/
+async function sessionInfo(request) {
+  const session =
+    getSession(request);
 
-async function session(req, res) {
-  const current =
-    getSession(req);
-
-  if (!current) {
-    return send(res, 401, {
-      ok: false,
-      authenticated: false
-    });
+  if (!session) {
+    return json(
+      {
+        ok: false,
+        authenticated: false
+      },
+      401
+    );
   }
 
-  send(res, 200, {
+  return json({
     ok: true,
     authenticated: true,
-    expiresAt:
-      current.exp
+    expiresAt: session.exp
   });
 }
 
-/*
-|--------------------------------------------------------------------------
-| GITHUB USER
-|--------------------------------------------------------------------------
-*/
+/* =========================
+   GITHUB USER
+========================= */
 
-async function getUser(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
-
+async function getUser() {
   const result =
     await github("/user");
 
-  send(
-    res,
-    result.response.status,
-    result.data
+  return json(
+    result.data,
+    result.response.status
   );
 }
 
-/*
-|--------------------------------------------------------------------------
-| LIST REPOSITORIES
-|--------------------------------------------------------------------------
-*/
+/* =========================
+   REPOSITORIES
+========================= */
 
-async function getRepos(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
+async function getRepos(request) {
+  const url =
+    new URL(request.url);
 
   const page =
-    Number(
-      req.query?.page || 1
-    );
+    url.searchParams.get("page") ||
+    "1";
 
   const perPage =
     Math.min(
       Number(
-        req.query?.per_page || 100
+        url.searchParams.get(
+          "per_page"
+        ) || 100
       ),
       100
     );
 
   const result =
     await github(
-      `/user/repos?` +
-      `page=${page}&` +
-      `per_page=${perPage}&` +
-      `sort=updated`
+      `/user/repos?page=${page}` +
+      `&per_page=${perPage}` +
+      `&sort=updated`
     );
 
-  send(
-    res,
-    result.response.status,
-    result.data
+  return json(
+    result.data,
+    result.response.status
   );
 }
 
-/*
-|--------------------------------------------------------------------------
-| CREATE REPOSITORY
-|--------------------------------------------------------------------------
-*/
+async function createRepo(request) {
+  const data =
+    await readBody(request);
 
-async function createRepo(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
-
-  const body =
-    await readBody(req);
-
-  const name =
-    String(body.name || "")
-      .trim();
-
-  if (!name) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "Nama repository wajib."
-    });
+  if (!data.name) {
+    return json(
+      {
+        ok: false,
+        error:
+          "Nama repository wajib."
+      },
+      400
+    );
   }
 
   const payload = {
-    name,
-
+    name: String(data.name),
     description:
       String(
-        body.description || ""
+        data.description || ""
       ),
-
     private:
-      Boolean(body.private),
-
+      Boolean(data.private),
     auto_init: true
   };
 
@@ -579,62 +410,55 @@ async function createRepo(req, res) {
       "/user/repos",
       {
         method: "POST",
-
         headers: {
           "Content-Type":
             "application/json"
         },
-
         body:
           JSON.stringify(payload)
       }
     );
 
-  send(
-    res,
-    result.response.status,
-    result.data
+  return json(
+    result.data,
+    result.response.status
   );
 }
 
-/*
-|--------------------------------------------------------------------------
-| LIST FILES / FOLDERS
-|--------------------------------------------------------------------------
-*/
+/* =========================
+   CONTENTS
+========================= */
 
-async function listContents(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
+async function listContents(request) {
+  const url =
+    new URL(request.url);
 
   const owner =
-    req.query?.owner;
+    url.searchParams.get("owner");
 
   const repo =
-    req.query?.repo;
+    url.searchParams.get("repo");
 
   const path =
-    req.query?.path || "";
+    url.searchParams.get("path") || "";
 
   const ref =
-    req.query?.ref;
+    url.searchParams.get("ref");
 
   if (!owner || !repo) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "owner dan repo wajib."
-    });
+    return json(
+      {
+        ok: false,
+        error:
+          "owner dan repo wajib."
+      },
+      400
+    );
   }
 
   let endpoint =
-    `${repoPath(owner, repo)}/contents`;
-
-  if (path) {
-    endpoint +=
-      `/${encodePath(path)}`;
-  }
+    `${repoPath(owner, repo)}` +
+    `/contents/${encodePath(path)}`;
 
   if (ref) {
     endpoint +=
@@ -644,51 +468,46 @@ async function listContents(req, res) {
   const result =
     await github(endpoint);
 
-  send(
-    res,
-    result.response.status,
-    result.data
+  return json(
+    result.data,
+    result.response.status
   );
 }
 
-/*
-|--------------------------------------------------------------------------
-| GET SINGLE FILE
-|--------------------------------------------------------------------------
-*/
+/* =========================
+   GET FILE
+========================= */
 
-async function getFile(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
+async function getFile(request) {
+  const url =
+    new URL(request.url);
 
   const owner =
-    req.query?.owner;
+    url.searchParams.get("owner");
 
   const repo =
-    req.query?.repo;
+    url.searchParams.get("repo");
 
   const path =
-    req.query?.path;
+    url.searchParams.get("path");
 
   const ref =
-    req.query?.ref;
+    url.searchParams.get("ref");
 
-  if (
-    !owner ||
-    !repo ||
-    !path
-  ) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "owner, repo dan path wajib."
-    });
+  if (!owner || !repo || !path) {
+    return json(
+      {
+        ok: false,
+        error:
+          "owner, repo dan path wajib."
+      },
+      400
+    );
   }
 
   let endpoint =
-    `${repoPath(owner, repo)}/contents/` +
-    encodePath(path);
+    `${repoPath(owner, repo)}` +
+    `/contents/${encodePath(path)}`;
 
   if (ref) {
     endpoint +=
@@ -698,142 +517,121 @@ async function getFile(req, res) {
   const result =
     await github(endpoint);
 
-  send(
-    res,
-    result.response.status,
-    result.data
+  return json(
+    result.data,
+    result.response.status
   );
 }
 
-/*
-|--------------------------------------------------------------------------
-| UPLOAD / OVERWRITE
-|--------------------------------------------------------------------------
-|
-| content harus Base64 murni.
-| Frontend bisa mengirim:
-|
-| data:image/png;base64,XXXX
-|
-| atau:
-|
-| XXXX
-|
-|--------------------------------------------------------------------------
-*/
+/* =========================
+   UPLOAD / OVERWRITE
+========================= */
 
-async function uploadFile(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
-
-  const body =
-    await readBody(req);
+async function uploadFile(request) {
+  const data =
+    await readBody(request);
 
   const owner =
-    String(body.owner || "");
+    data.owner;
 
   const repo =
-    String(body.repo || "");
+    data.repo;
 
   const path =
-    String(body.path || "");
+    data.path;
 
-  let content =
-    String(body.content ?? "");
+  const content =
+    data.content;
 
   if (
     !owner ||
     !repo ||
-    !path
+    !path ||
+    content === undefined
   ) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "owner, repo dan path wajib."
-    });
-  }
-
-  /*
-   * Hilangkan data URL prefix
-   */
-
-  if (
-    content.startsWith(
-      "data:"
-    )
-  ) {
-    const comma =
-      content.indexOf(",");
-
-    if (comma !== -1) {
-      content =
-        content.slice(
-          comma + 1
-        );
-    }
-  }
-
-  /*
-   * GitHub membutuhkan Base64.
-   */
-
-  content =
-    content.replace(
-     (/\s+/g),
-      ""
+    return json(
+      {
+        ok: false,
+        error:
+          "owner, repo, path dan content wajib."
+      },
+      400
     );
-
-  /*
-   * Cari SHA jika file sudah ada.
-   */
+  }
 
   let sha =
-    body.sha || null;
+    data.sha || null;
+
+  /*
+   * Kalau SHA tidak dikirim,
+   * cek apakah file sudah ada.
+   */
 
   if (!sha) {
     const existing =
       await github(
-        `${repoPath(owner, repo)}/contents/` +
-        encodePath(path)
+        `${repoPath(owner, repo)}` +
+        `/contents/${encodePath(path)}`
       );
 
     if (
       existing.response.ok &&
-      existing.data?.sha
+      existing.data.sha
     ) {
       sha =
         existing.data.sha;
     }
   }
 
+  /*
+   * content harus berupa Base64.
+   *
+   * Foto/video:
+   * data:image/jpeg;base64,...
+   *
+   * kita ambil bagian Base64-nya.
+   */
+
+  let finalContent =
+    String(content);
+
+  if (
+    finalContent.includes(
+      "base64,"
+    )
+  ) {
+    finalContent =
+      finalContent.split(
+        "base64,"
+      )[1];
+  }
+
   const payload = {
     message:
-      String(
-        body.message ||
-        (
-          sha
-            ? `Update ${path}`
-            : `Upload ${path}`
-        )
-      ),
+      data.message ||
+      `YasamGit: ${
+        sha
+          ? "update"
+          : "upload"
+      } ${path}`,
 
-    content
+    content:
+      finalContent
   };
 
   if (sha) {
     payload.sha = sha;
   }
 
-  if (body.branch) {
+  if (data.branch) {
     payload.branch =
-      String(body.branch);
+      data.branch;
   }
 
   const result =
     await github(
-      `${repoPath(owner, repo)}/contents/` +
-      encodePath(path),
+      `${repoPath(owner, repo)}` +
+      `/contents/${encodePath(path)}`,
       {
         method: "PUT",
 
@@ -847,71 +645,59 @@ async function uploadFile(req, res) {
       }
     );
 
-  send(
-    res,
-    result.response.status,
-    result.data
+  return json(
+    result.data,
+    result.response.status
   );
 }
 
-/*
-|--------------------------------------------------------------------------
-| DELETE FILE
-|--------------------------------------------------------------------------
-*/
+/* =========================
+   DELETE
+========================= */
 
-async function deleteFile(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
-
-  const body =
-    await readBody(req);
-
-  const owner =
-    String(body.owner || "");
-
-  const repo =
-    String(body.repo || "");
-
-  const path =
-    String(body.path || "");
-
-  const sha =
-    String(body.sha || "");
+async function deleteFile(request) {
+  const data =
+    await readBody(request);
 
   if (
-    !owner ||
-    !repo ||
-    !path ||
-    !sha
+    !data.owner ||
+    !data.repo ||
+    !data.path ||
+    !data.sha
   ) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "owner, repo, path dan sha wajib."
-    });
+    return json(
+      {
+        ok: false,
+        error:
+          "owner, repo, path dan sha wajib."
+      },
+      400
+    );
   }
 
   const payload = {
     message:
-      String(
-        body.message ||
-        `Delete ${path}`
-      ),
+      data.message ||
+      `YasamGit: delete ${data.path}`,
 
-    sha
+    sha:
+      data.sha
   };
 
-  if (body.branch) {
+  if (data.branch) {
     payload.branch =
-      String(body.branch);
+      data.branch;
   }
 
   const result =
     await github(
-      `${repoPath(owner, repo)}/contents/` +
-      encodePath(path),
+      `${repoPath(
+        data.owner,
+        data.repo
+      )}` +
+      `/contents/${encodePath(
+        data.path
+      )}`,
       {
         method: "DELETE",
 
@@ -925,107 +711,90 @@ async function deleteFile(req, res) {
       }
     );
 
-  send(
-    res,
-    result.response.status,
-    result.data
+  return json(
+    result.data,
+    result.response.status
   );
 }
 
-/*
-|--------------------------------------------------------------------------
-| RENAME FILE / FOLDER ITEM
-|--------------------------------------------------------------------------
-|
-| GitHub Contents API tidak memiliki rename
-| langsung. Kita copy kemudian delete.
-|
-|--------------------------------------------------------------------------
-*/
+/* =========================
+   RENAME
+========================= */
 
-async function renameFile(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
-
-  const body =
-    await readBody(req);
-
-  const owner =
-    String(body.owner || "");
-
-  const repo =
-    String(body.repo || "");
-
-  const oldPath =
-    String(body.oldPath || "");
-
-  const newPath =
-    String(body.newPath || "");
+async function renameFile(request) {
+  const data =
+    await readBody(request);
 
   if (
-    !owner ||
-    !repo ||
-    !oldPath ||
-    !newPath
+    !data.owner ||
+    !data.repo ||
+    !data.oldPath ||
+    !data.newPath
   ) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "owner, repo, oldPath dan newPath wajib."
-    });
+    return json(
+      {
+        ok: false,
+        error:
+          "owner, repo, oldPath dan newPath wajib."
+      },
+      400
+    );
   }
-
-  /*
-   * Ambil file lama.
-   */
 
   const oldFile =
     await github(
-      `${repoPath(owner, repo)}/contents/` +
-      encodePath(oldPath)
+      `${repoPath(
+        data.owner,
+        data.repo
+      )}` +
+      `/contents/${encodePath(
+        data.oldPath
+      )}`
     );
 
-  if (
-    !oldFile.response.ok
-  ) {
-    return send(
-      res,
-      oldFile.response.status,
-      oldFile.data
+  if (!oldFile.response.ok) {
+    return json(
+      oldFile.data,
+      oldFile.response.status
     );
   }
 
   /*
-   * Buat file baru.
+   * GitHub Contents API tidak mempunyai
+   * rename langsung.
+   *
+   * Jadi:
+   * 1. Ambil file
+   * 2. Buat file baru
+   * 3. Hapus file lama
    */
 
   const createPayload = {
     message:
-      String(
-        body.message ||
-        `Rename ${oldPath} to ${newPath}`
-      ),
+      data.message ||
+      `YasamGit: rename ${data.oldPath}`,
 
     content:
-      String(
-        oldFile.data.content || ""
-      )
-        .replace(
-         (/\s+/g),
-          ""
-        )
+      oldFile.data.content,
+
+    sha:
+      undefined
   };
 
-  if (body.branch) {
+  if (data.branch) {
     createPayload.branch =
-      String(body.branch);
+      data.branch;
   }
 
-  const created =
+  const newFile =
     await github(
-      `${repoPath(owner, repo)}/contents/` +
-      encodePath(newPath),
+      `${repoPath(
+        data.owner,
+        data.repo
+      )}` +
+      `/contents/${encodePath(
+        data.newPath
+      )}`,
       {
         method: "PUT",
 
@@ -1041,24 +810,35 @@ async function renameFile(req, res) {
       }
     );
 
-  if (
-    !created.response.ok
-  ) {
-    return send(
-      res,
-      created.response.status,
-      created.data
+  if (!newFile.response.ok) {
+    return json(
+      newFile.data,
+      newFile.response.status
     );
   }
 
-  /*
-   * Hapus file lama.
-   */
+  const deletePayload = {
+    message:
+      `YasamGit: remove ${data.oldPath}`,
 
-  const deleted =
+    sha:
+      oldFile.data.sha
+  };
+
+  if (data.branch) {
+    deletePayload.branch =
+      data.branch;
+  }
+
+  const removed =
     await github(
-      `${repoPath(owner, repo)}/contents/` +
-      encodePath(oldPath),
+      `${repoPath(
+        data.owner,
+        data.repo
+      )}` +
+      `/contents/${encodePath(
+        data.oldPath
+      )}`,
       {
         method: "DELETE",
 
@@ -1068,788 +848,322 @@ async function renameFile(req, res) {
         },
 
         body:
-          JSON.stringify({
-            message:
-              `Delete old name ${oldPath}`,
-
-            sha:
-              oldFile.data.sha,
-
-            ...(body.branch
-              ? {
-                  branch:
-                    String(
-                      body.branch
-                    )
-                }
-              : {})
-          })
+          JSON.stringify(
+            deletePayload
+          )
       }
     );
 
-  if (
-    !deleted.response.ok
-  ) {
-    return send(res, 500, {
-      ok: false,
-
-      error:
-        "File baru berhasil dibuat, tetapi file lama gagal dihapus.",
-
-      created:
-        created.data,
-
-      deleteError:
-        deleted.data
-    });
+  if (!removed.response.ok) {
+    return json(
+      {
+        ok: false,
+        error:
+          "File baru berhasil dibuat tetapi file lama gagal dihapus.",
+        created:
+          newFile.data,
+        deleteError:
+          removed.data
+      },
+      500
+    );
   }
 
-  send(res, 200, {
+  return json({
     ok: true,
-
     message:
       "Rename berhasil.",
 
     result:
-      created.data
+      newFile.data
   });
 }
 
-/*
-|--------------------------------------------------------------------------
-| CREATE FOLDER
-|--------------------------------------------------------------------------
-|
-| GitHub tidak menyimpan folder kosong.
-| Folder dibuat menggunakan .gitkeep.
-|
-|--------------------------------------------------------------------------
-*/
+/* =========================
+   BRANCHES
+========================= */
 
-async function createFolder(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
-
-  const body =
-    await readBody(req);
+async function getBranches(request) {
+  const url =
+    new URL(request.url);
 
   const owner =
-    String(body.owner || "");
+    url.searchParams.get("owner");
 
   const repo =
-    String(body.repo || "");
-
-  const folder =
-    String(body.folder || "")
-      .replace(
-        /^\/+|\/+$/g,
-        ""
-      );
-
-  if (
-    !owner ||
-    !repo ||
-    !folder
-  ) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "owner, repo dan folder wajib."
-    });
-  }
-
-  const path =
-    `${folder}/.gitkeep`;
-
-  const payload = {
-    message:
-      String(
-        body.message ||
-        `Create folder ${folder}`
-      ),
-
-    content: ""
-  };
-
-  if (body.branch) {
-    payload.branch =
-      String(body.branch);
-  }
-
-  const result =
-    await github(
-      `${repoPath(owner, repo)}/contents/` +
-      encodePath(path),
-      {
-        method: "PUT",
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify(payload)
-      }
-    );
-
-  send(
-    res,
-    result.response.status,
-    result.data
-  );
-}
-
-/*
-|--------------------------------------------------------------------------
-| BRANCHES
-|--------------------------------------------------------------------------
-*/
-
-async function branches(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
-
-  const owner =
-    req.query?.owner;
-
-  const repo =
-    req.query?.repo;
+    url.searchParams.get("repo");
 
   if (!owner || !repo) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "owner dan repo wajib."
-    });
-  }
-
-  const result =
-    await github(
-      `${repoPath(owner, repo)}/branches?per_page=100`
-    );
-
-  send(
-    res,
-    result.response.status,
-    result.data
-  );
-}
-
-/*
-|--------------------------------------------------------------------------
-| SEARCH REPOSITORIES
-|--------------------------------------------------------------------------
-*/
-
-async function searchRepos(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
-
-  const q =
-    String(
-      req.query?.q || ""
-    ).trim();
-
-  if (!q) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "Query wajib."
-    });
-  }
-
-  const user =
-    await github("/user");
-
-  if (
-    !user.response.ok
-  ) {
-    return send(
-      res,
-      user.response.status,
-      user.data
-    );
-  }
-
-  const username =
-    user.data.login;
-
-  const result =
-    await github(
-      `/search/repositories?` +
-      `q=${encodeURIComponent(q)}` +
-      `+user:${encodeURIComponent(username)}`
-    );
-
-  send(
-    res,
-    result.response.status,
-    result.data
-  );
-}
-
-/*
-|--------------------------------------------------------------------------
-| SEARCH FILES
-|--------------------------------------------------------------------------
-|
-| GitHub Code Search memerlukan permission
-| tertentu pada token. Jika tidak tersedia,
-| frontend bisa menggunakan pencarian file
-| dari folder yang sedang dibuka.
-|
-|--------------------------------------------------------------------------
-*/
-
-async function searchFiles(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
-
-  const owner =
-    String(
-      req.query?.owner || ""
-    );
-
-  const repo =
-    String(
-      req.query?.repo || ""
-    );
-
-  const q =
-    String(
-      req.query?.q || ""
-    ).trim();
-
-  if (
-    !owner ||
-    !repo ||
-    !q
-  ) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "owner, repo dan q wajib."
-    });
-  }
-
-  const query =
-    `${q} repo:${owner}/${repo}`;
-
-  const result =
-    await github(
-      `/search/code?q=${encodeURIComponent(query)}`
-    );
-
-  send(
-    res,
-    result.response.status,
-    result.data
-  );
-}
-
-/*
-|--------------------------------------------------------------------------
-| DOWNLOAD
-|--------------------------------------------------------------------------
-|
-| Download binary lebih baik dilakukan langsung
-| dari GitHub download_url yang diberikan API.
-|
-| Endpoint ini mengambil file dari GitHub dan
-| mengirim binary ke browser.
-|
-|--------------------------------------------------------------------------
-*/
-
-async function downloadFile(req, res) {
-  if (
-    !requireSession(req, res)
-  ) return;
-
-  const owner =
-    String(
-      req.query?.owner || ""
-    );
-
-  const repo =
-    String(
-      req.query?.repo || ""
-    );
-
-  const path =
-    String(
-      req.query?.path || ""
-    );
-
-  if (
-    !owner ||
-    !repo ||
-    !path
-  ) {
-    return send(res, 400, {
-      ok: false,
-      error:
-        "owner, repo dan path wajib."
-    });
-  }
-
-  const result =
-    await github(
-      `${repoPath(owner, repo)}/contents/` +
-      encodePath(path)
-    );
-
-  if (
-    !result.response.ok
-  ) {
-    return send(
-      res,
-      result.response.status,
-      result.data
-    );
-  }
-
-  /*
-   * GitHub API mengembalikan content Base64.
-   */
-
-  if (
-    result.data.content
-  ) {
-
-    const buffer =
-      Buffer.from(
-        String(
-          result.data.content
-        ).replace(
-         (/\s+/g),
-          ""
-        ),
-        "base64"
-      );
-
-    res.statusCode = 200;
-
-    res.setHeader(
-      "Content-Type",
-      "application/octet-stream"
-    );
-
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="${encodeURIComponent(
-        path.split("/").pop()
-      )}"`
-    );
-
-    res.setHeader(
-      "Content-Length",
-      buffer.length
-    );
-
-    res.end(buffer);
-
-    return;
-  }
-
-  /*
-   * Untuk file terlalu besar, gunakan
-   * download_url GitHub.
-   */
-
-  if (result.data.download_url) {
-
-    const remote =
-      await fetch(
-        result.data.download_url
-      );
-
-    if (!remote.ok) {
-      return send(res, 502, {
+    return json(
+      {
         ok: false,
         error:
-          "Gagal mengambil file dari GitHub."
-      });
-    }
-
-    res.statusCode =
-      remote.status;
-
-    const contentType =
-      remote.headers.get(
-        "content-type"
-      );
-
-    if (contentType) {
-      res.setHeader(
-        "Content-Type",
-        contentType
-      );
-    }
-
-    const buffer =
-      Buffer.from(
-        await remote.arrayBuffer()
-      );
-
-    res.setHeader(
-      "Content-Length",
-      buffer.length
+          "owner dan repo wajib."
+      },
+      400
     );
-
-    res.end(buffer);
-
-    return;
   }
 
-  send(res, 404, {
-    ok: false,
-    error:
-      "Download URL tidak tersedia."
-  });
+  const result =
+    await github(
+      `${repoPath(
+        owner,
+        repo
+      )}/branches?per_page=100`
+    );
+
+  return json(
+    result.data,
+    result.response.status
+  );
 }
 
-/*
-|--------------------------------------------------------------------------
-| ROUTER
-|--------------------------------------------------------------------------
-*/
+/* =========================
+   SEARCH REPOSITORIES
+========================= */
 
-async function handler(req, res) {
+async function searchRepos(request) {
+  const url =
+    new URL(request.url);
 
-  /*
-   * CORS preflight
-   */
+  const q =
+    url.searchParams.get("q");
+
+  if (!q) {
+    return json(
+      {
+        ok: false,
+        error:
+          "Query wajib."
+      },
+      400
+    );
+  }
+
+  const result =
+    await github(
+      `/search/repositories?q=${encodeURIComponent(
+        q
+      )}+user:${encodeURIComponent(
+        ""
+      )}`
+    );
+
+  return json(
+    result.data,
+    result.response.status
+  );
+}
+
+/* =========================
+   ROUTER
+========================= */
+
+async function handler(request) {
+  const url =
+    new URL(request.url);
+
+  const path =
+    url.pathname;
 
   if (
-    req.method === "OPTIONS"
+    request.method === "OPTIONS"
   ) {
+    return {
+      status: 204,
+      headers: corsHeaders(),
+      body: ""
+    };
+  }
 
-    res.statusCode = 204;
+  if (
+    path === "/api/health"
+  ) {
+    return json({
+      ok: true,
+      service:
+        "YasamGit Backend",
+      version: "5.2.0"
+    });
+  }
 
-    const headers =
-      corsHeaders();
+  if (
+    path === "/api/login" &&
+    request.method === "POST"
+  ) {
+    return login(request);
+  }
+
+  if (
+    path === "/api/logout" &&
+    request.method === "POST"
+  ) {
+    return logout();
+  }
+
+  if (
+    path === "/api/session"
+  ) {
+    return sessionInfo(request);
+  }
+
+  const session =
+    getSession(request);
+
+  if (!session) {
+    return json(
+      {
+        ok: false,
+        error:
+          "Unauthorized. Silakan login."
+      },
+      401
+    );
+  }
+
+  requireEnvironment();
+
+  /* USER */
+
+  if (
+    path === "/api/github/user" &&
+    request.method === "GET"
+  ) {
+    return getUser();
+  }
+
+  /* REPOSITORIES */
+
+  if (
+    path === "/api/github/repos" &&
+    request.method === "GET"
+  ) {
+    return getRepos(request);
+  }
+
+  if (
+    path === "/api/github/repos" &&
+    request.method === "POST"
+  ) {
+    return createRepo(request);
+  }
+
+  /* CONTENTS */
+
+  if (
+    path === "/api/github/contents" &&
+    request.method === "GET"
+  ) {
+    return listContents(request);
+  }
+
+  /* FILE */
+
+  if (
+    path === "/api/github/file" &&
+    request.method === "GET"
+  ) {
+    return getFile(request);
+  }
+
+  /* UPLOAD */
+
+  if (
+    path === "/api/github/upload" &&
+    request.method === "POST"
+  ) {
+    return uploadFile(request);
+  }
+
+  /* DELETE */
+
+  if (
+    path === "/api/github/delete" &&
+    request.method === "POST"
+  ) {
+    return deleteFile(request);
+  }
+
+  /* RENAME */
+
+  if (
+    path === "/api/github/rename" &&
+    request.method === "POST"
+  ) {
+    return renameFile(request);
+  }
+
+  /* BRANCHES */
+
+  if (
+    path === "/api/github/branches" &&
+    request.method === "GET"
+  ) {
+    return getBranches(request);
+  }
+
+  /* SEARCH */
+
+  if (
+    path === "/api/github/search" &&
+    request.method === "GET"
+  ) {
+    return searchRepos(request);
+  }
+
+  return json(
+    {
+      ok: false,
+      error:
+        "Endpoint tidak ditemukan."
+    },
+    404
+  );
+}
+
+module.exports = async (
+  request,
+  response
+) => {
+  try {
+    const result =
+      await handler(request);
+
+    response.statusCode =
+      result.status;
 
     for (
       const [key, value]
-      of Object.entries(headers)
+      of Object.entries(
+        result.headers || {}
+      )
     ) {
-      res.setHeader(
+      response.setHeader(
         key,
         value
       );
     }
 
-    res.end();
+    response.end(
+      result.body || ""
+    );
+  } catch (error) {
+    console.error(error);
 
-    return;
-  }
+    response.statusCode = 500;
 
-  const path =
-    req.url
-      .split("?")[0]
-      .replace(
-        /\/$/,
-        ""
-      );
+    response.setHeader(
+      "Content-Type",
+      "application/json"
+    );
 
-  /*
-   * Health
-   */
-
-  if (
-    path === "/api" ||
-    path === "/api/health"
-  ) {
-    return health(
-      req,
-      res
+    response.end(
+      JSON.stringify({
+        ok: false,
+        error:
+          error.message ||
+          "Internal Server Error"
+      })
     );
   }
-
-  /*
-   * Auth
-   */
-
-  if (
-    path === "/api/login" &&
-    req.method === "POST"
-  ) {
-    return login(
-      req,
-      res
-    );
-  }
-
-  if (
-    path === "/api/logout" &&
-    req.method === "POST"
-  ) {
-    return logout(
-      req,
-      res
-    );
-  }
-
-  if (
-    path === "/api/session" &&
-    req.method === "GET"
-  ) {
-    return session(
-      req,
-      res
-    );
-  }
-
-  /*
-   * GitHub User
-   */
-
-  if (
-    path === "/api/github/user" &&
-    req.method === "GET"
-  ) {
-    return getUser(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Repositories
-   */
-
-  if (
-    path === "/api/github/repos" &&
-    req.method === "GET"
-  ) {
-    return getRepos(
-      req,
-      res
-    );
-  }
-
-  if (
-    path === "/api/github/repos" &&
-    req.method === "POST"
-  ) {
-    return createRepo(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Contents
-   */
-
-  if (
-    path === "/api/github/contents" &&
-    req.method === "GET"
-  ) {
-    return listContents(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Single file
-   */
-
-  if (
-    path === "/api/github/file" &&
-    req.method === "GET"
-  ) {
-    return getFile(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Upload / overwrite
-   */
-
-  if (
-    path === "/api/github/upload" &&
-    req.method === "POST"
-  ) {
-    return uploadFile(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Delete
-   */
-
-  if (
-    path === "/api/github/delete" &&
-    req.method === "POST"
-  ) {
-    return deleteFile(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Rename
-   */
-
-  if (
-    path === "/api/github/rename" &&
-    req.method === "POST"
-  ) {
-    return renameFile(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Create folder
-   */
-
-  if (
-    path === "/api/github/folder" &&
-    req.method === "POST"
-  ) {
-    return createFolder(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Branches
-   */
-
-  if (
-    path === "/api/github/branches" &&
-    req.method === "GET"
-  ) {
-    return branches(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Search repositories
-   */
-
-  if (
-    path === "/api/github/search" &&
-    req.method === "GET"
-  ) {
-    return searchRepos(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Search files
-   */
-
-  if (
-    path === "/api/github/search-files" &&
-    req.method === "GET"
-  ) {
-    return searchFiles(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Download
-   */
-
-  if (
-    path === "/api/github/download" &&
-    req.method === "GET"
-  ) {
-    return downloadFile(
-      req,
-      res
-    );
-  }
-
-  /*
-   * Not found
-   */
-
-  send(res, 404, {
-    ok: false,
-    error:
-      "Endpoint tidak ditemukan.",
-    path
-  });
-}
-
-/*
-|--------------------------------------------------------------------------
-| VERCEL ENTRY
-|--------------------------------------------------------------------------
-*/
-
-module.exports =
-  async function(req, res) {
-
-    try {
-
-      /*
-       * Pastikan konfigurasi dasar tersedia.
-       */
-
-      if (
-        !process.env.GITHUB_TOKEN &&
-        !(
-          req.url === "/api" ||
-          req.url === "/api/health"
-        )
-      ) {
-        return send(res, 500, {
-          ok: false,
-          error:
-            "GITHUB_TOKEN belum diset di Vercel."
-        });
-      }
-
-      await handler(
-        req,
-        res
-      );
-
-    } catch (error) {
-
-      console.error(
-        "YasamGit Backend Error:",
-        error
-      );
-
-      if (!res.headersSent) {
-
-        send(res, 500, {
-          ok: false,
-          error:
-            error.message ||
-            "Internal Server Error"
-        });
-
-      } else {
-
-        res.end();
-
-      }
-    }
-  };
+};
