@@ -1,1037 +1,702 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <meta
-    name="theme-color"
-    content="#0f172a"
-  >
-
-  <title>YasamGit</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-      background:
-        #0f172a;
-
-      color:
-        #e5e7eb;
-
-      min-height:
-        100vh;
-    }
-
-    .container {
-      width:
-        min(100% - 32px, 1100px);
-
-      margin:
-        0 auto;
-    }
-
-    header {
-      border-bottom:
-        1px solid #1e293b;
-
-      background:
-        #0f172a;
-    }
-
-    .navbar {
-      min-height:
-        70px;
-
-      display:
-        flex;
-
-      align-items:
-        center;
-
-      justify-content:
-        space-between;
-
-      gap:
-        20px;
-    }
-
-    .brand {
-      font-size:
-        24px;
-
-      font-weight:
-        800;
-
-      color:
-        #ffffff;
-    }
-
-    .brand span {
-      color:
-        #60a5fa;
-    }
-
-    .status {
-      display:
-        flex;
-
-      align-items:
-        center;
-
-      gap:
-        8px;
-
-      font-size:
-        13px;
-
-      color:
-        #94a3b8;
-    }
-
-    .dot {
-      width:
-        9px;
-
-      height:
-        9px;
-
-      border-radius:
-        50%;
-
-      background:
-        #22c55e;
-    }
-
-    main {
-      padding:
-        60px 0;
-    }
-
-    .hero {
-      text-align:
-        center;
-
-      margin-bottom:
-        40px;
-    }
-
-    .hero h1 {
-      font-size:
-        clamp(32px, 6vw, 58px);
-
-      line-height:
-        1.05;
-
-      color:
-        #ffffff;
-
-      margin-bottom:
-        18px;
-    }
-
-    .hero p {
-      color:
-        #94a3b8;
-
-      max-width:
-        650px;
-
-      margin:
-        0 auto;
-
-      line-height:
-        1.7;
-    }
-
-    .card {
-      max-width:
-        480px;
-
-      margin:
-        0 auto;
-
-      background:
-        #111827;
-
-      border:
-        1px solid #1e293b;
-
-      border-radius:
-        18px;
-
-      padding:
-        28px;
-
-      box-shadow:
-        0 20px 60px rgba(0, 0, 0, .25);
-    }
-
-    .card h2 {
-      color:
-        #ffffff;
-
-      margin-bottom:
-        8px;
-    }
-
-    .card-description {
-      color:
-        #94a3b8;
-
-      font-size:
-        14px;
-
-      line-height:
-        1.6;
-
-      margin-bottom:
-        24px;
-    }
-
-    label {
-      display:
-        block;
-
-      margin-bottom:
-        8px;
-
-      color:
-        #cbd5e1;
-
-      font-size:
-        14px;
-
-      font-weight:
-        600;
-    }
-
-    input {
-      width:
-        100%;
-
-      padding:
-        13px 14px;
-
-      border:
-        1px solid #334155;
-
-      border-radius:
-        10px;
-
-      outline:
-        none;
-
-      background:
-        #0f172a;
-
-      color:
-        #ffffff;
-
-      font-size:
-        15px;
-
-      margin-bottom:
-        14px;
-    }
-
-    input:focus {
-      border-color:
-        #60a5fa;
-    }
-
-    button {
-      width:
-        100%;
-
-      padding:
-        13px 16px;
-
-      border:
-        0;
-
-      border-radius:
-        10px;
-
-      background:
-        #2563eb;
-
-      color:
-        #ffffff;
-
-      font-size:
-        15px;
-
-      font-weight:
-        700;
-
-      cursor:
-        pointer;
-
-      transition:
-        .2s;
-    }
-
-    button:hover {
-      background:
-        #1d4ed8;
-    }
-
-    button:disabled {
-      opacity:
-        .6;
-
-      cursor:
-        not-allowed;
-    }
-
-    .message {
-      margin-top:
-        16px;
-
-      padding:
-        12px;
-
-      border-radius:
-        10px;
-
-      font-size:
-        14px;
-
-      line-height:
-        1.5;
-
-      display:
-        none;
-    }
-
-    .message.show {
-      display:
-        block;
-    }
-
-    .message.success {
-      background:
-        rgba(34, 197, 94, .1);
-
-      border:
-        1px solid rgba(34, 197, 94, .3);
-
-      color:
-        #86efac;
-    }
-
-    .message.error {
-      background:
-        rgba(239, 68, 68, .1);
-
-      border:
-        1px solid rgba(239, 68, 68, .3);
-
-      color:
-        #fca5a5;
-    }
-
-    .dashboard {
-      display:
-        none;
-
-      max-width:
-        900px;
-
-      margin:
-        0 auto;
-    }
-
-    .dashboard.show {
-      display:
-        block;
-    }
-
-    .dashboard-header {
-      display:
-        flex;
-
-      align-items:
-        center;
-
-      justify-content:
-        space-between;
-
-      gap:
-        15px;
-
-      margin-bottom:
-        20px;
-    }
-
-    .dashboard-header h2 {
-      color:
-        #ffffff;
-    }
-
-    .logout {
-      width:
-        auto;
-
-      padding:
-        10px 16px;
-
-      background:
-        #dc2626;
-    }
-
-    .logout:hover {
-      background:
-        #b91c1c;
-    }
-
-    .grid {
-      display:
-        grid;
-
-      grid-template-columns:
-        repeat(auto-fit, minmax(200px, 1fr));
-
-      gap:
-        16px;
-    }
-
-    .feature {
-      background:
-        #111827;
-
-      border:
-        1px solid #1e293b;
-
-      border-radius:
-        14px;
-
-      padding:
-        20px;
-    }
-
-    .feature h3 {
-      color:
-        #ffffff;
-
-      margin-bottom:
-        8px;
-    }
-
-    .feature p {
-      color:
-        #94a3b8;
-
-      font-size:
-        14px;
-
-      line-height:
-        1.5;
-    }
-
-    .api-info {
-      margin-top:
-        30px;
-
-      background:
-        #020617;
-
-      border:
-        1px solid #1e293b;
-
-      border-radius:
-        14px;
-
-      padding:
-        20px;
-    }
-
-    .api-info h3 {
-      margin-bottom:
-        12px;
-
-      color:
-        #ffffff;
-    }
-
-    .api-info code {
-      display:
-        block;
-
-      color:
-        #93c5fd;
-
-      font-family:
-        monospace;
-
-      font-size:
-        13px;
-
-      line-height:
-        1.8;
-
-      overflow-x:
-        auto;
-    }
-
-    footer {
-      text-align:
-        center;
-
-      padding:
-        30px 0;
-
-      color:
-        #64748b;
-
-      font-size:
-        13px;
-    }
-
-    .hidden {
-      display:
-        none !important;
-    }
-
-    @media (max-width: 600px) {
-      .navbar {
-        min-height:
-          60px;
-      }
-
-      main {
-        padding:
-          35px 0;
-      }
-
-      .card {
-        padding:
-          22px;
-      }
-
-      .dashboard-header {
-        align-items:
-          flex-start;
-
-        flex-direction:
-          column;
-      }
-
-      .logout {
-        width:
-          100%;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>YasamGit V5.2</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.container {
+  width: min(1100px, calc(100% - 30px));
+  margin: auto;
+}
+
+header {
+  background: #111827;
+  border-bottom: 1px solid #1e293b;
+}
+
+.nav {
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 23px;
+  font-weight: bold;
+  color: white;
+}
+
+.logo span {
+  color: #60a5fa;
+}
+
+main {
+  padding: 30px 0;
+}
+
+.card {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 15px;
+  padding: 22px;
+  margin-bottom: 20px;
+}
+
+h1,
+h2,
+h3 {
+  color: white;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 11px;
+  border-radius: 9px;
+  border: 1px solid #334155;
+  background: #020617;
+  color: white;
+  outline: none;
+}
+
+textarea {
+  min-height: 300px;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #60a5fa;
+}
+
+label {
+  display: block;
+  margin: 12px 0 7px;
+  font-size: 14px;
+}
+
+button {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 16px;
+  background: #2563eb;
+  color: white;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+button.danger {
+  background: #dc2626;
+}
+
+button.secondary {
+  background: #334155;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.row > * {
+  flex: 1;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.message {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 9px;
+  display: none;
+}
+
+.message.show {
+  display: block;
+}
+
+.success {
+  background: #064e3b;
+  color: #a7f3d0;
+}
+
+.error {
+  background: #450a0a;
+  color: #fecaca;
+}
+
+.repo-item,
+.file-item {
+  background: #020617;
+  border: 1px solid #1e293b;
+  padding: 13px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
+.repo-item:hover,
+.file-item:hover {
+  border-color: #3b82f6;
+}
+
+.item-title {
+  font-weight: bold;
+  color: white;
+}
+
+.item-meta {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 5px;
+}
+
+.actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.actions button {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.status {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.online {
+  color: #4ade80;
+}
+
+.editor {
+  margin-top: 20px;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media(max-width:600px) {
+  .nav {
+    height: 58px;
+  }
+
+  .row {
+    flex-direction: column;
+  }
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <div class="container navbar">
+<div class="container nav">
 
-    <div class="brand">
-      Yasam<span>Git</span>
-    </div>
-
-    <div class="status">
-      <span class="dot"></span>
-      <span id="backendStatus">
-        Checking backend...
-      </span>
-    </div>
-
+  <div class="logo">
+    Yasam<span>Git</span>
   </div>
+
+  <div id="status" class="status">
+    Checking...
+  </div>
+
+</div>
 </header>
 
 
-<main>
+<main class="container">
 
-  <div class="container">
+<!-- LOGIN -->
 
-    <section class="hero">
+<section id="loginPage" class="card">
 
-      <h1>
-        YasamGit
-      </h1>
+  <h2>Login YasamGit</h2>
 
-      <p>
-        Git repository manager sederhana dengan
-        backend V5.2 yang berjalan langsung di Vercel.
-      </p>
+  <p>
+    Masukkan password administrator.
+  </p>
 
-    </section>
+  <form id="loginForm">
 
+    <label>Password</label>
 
-    <!-- LOGIN -->
-
-    <section
-      id="loginSection"
-      class="card"
+    <input
+      id="password"
+      type="password"
+      autocomplete="current-password"
+      required
     >
 
-      <h2>
-        Login
-      </h2>
+    <br><br>
 
-      <p class="card-description">
-        Masukkan password administrator untuk
-        mengakses YasamGit.
-      </p>
+    <button type="submit">
+      Login
+    </button>
 
-      <form id="loginForm">
+  </form>
 
-        <label for="password">
-          Password
-        </label>
+  <div id="loginMessage" class="message"></div>
 
-        <input
-          id="password"
-          type="password"
-          placeholder="Masukkan password"
-          autocomplete="current-password"
-          required
-        >
+</section>
 
+
+<!-- DASHBOARD -->
+
+<section id="dashboard" class="hidden">
+
+  <div class="card">
+
+    <div class="row">
+
+      <div>
+        <h2>Dashboard</h2>
+        <span id="userStatus">
+          Login berhasil
+        </span>
+      </div>
+
+      <div>
         <button
-          id="loginButton"
-          type="submit"
-        >
-          Login
-        </button>
-
-      </form>
-
-      <div
-        id="loginMessage"
-        class="message"
-      ></div>
-
-    </section>
-
-
-    <!-- DASHBOARD -->
-
-    <section
-      id="dashboardSection"
-      class="dashboard"
-    >
-
-      <div class="dashboard-header">
-
-        <div>
-          <h2>
-            YasamGit Dashboard
-          </h2>
-        </div>
-
-        <button
-          id="logoutButton"
-          class="logout"
-          type="button"
+          class="danger"
+          onclick="logout()"
         >
           Logout
         </button>
-
       </div>
 
-
-      <div class="grid">
-
-        <div class="feature">
-          <h3>Repository</h3>
-
-          <p>
-            Kelola repository dan informasi
-            project.
-          </p>
-        </div>
-
-        <div class="feature">
-          <h3>Upload</h3>
-
-          <p>
-            Upload file binary maupun file biasa.
-          </p>
-        </div>
-
-        <div class="feature">
-          <h3>File Manager</h3>
-
-          <p>
-            Rename, edit, overwrite, dan delete
-            file.
-          </p>
-        </div>
-
-        <div class="feature">
-          <h3>Search</h3>
-
-          <p>
-            Cari repository dan file dengan cepat.
-          </p>
-        </div>
-
-      </div>
-
-
-      <div class="api-info">
-
-        <h3>
-          Backend Status
-        </h3>
-
-        <code id="apiStatus">
-          Checking...
-        </code>
-
-      </div>
-
-    </section>
+    </div>
 
   </div>
+
+
+  <!-- REPOSITORIES -->
+
+  <div class="card">
+
+    <h2>Repository</h2>
+
+    <div class="row">
+
+      <button onclick="loadRepos()">
+        Refresh Repository
+      </button>
+
+      <button
+        class="secondary"
+        onclick="createRepo()"
+      >
+        + Repository
+      </button>
+
+    </div>
+
+    <div id="repos"></div>
+
+  </div>
+
+
+  <!-- FILE MANAGER -->
+
+  <div
+    id="fileManager"
+    class="card hidden"
+  >
+
+    <h2 id="repoTitle">
+      Repository
+    </h2>
+
+    <div class="row">
+
+      <input
+        id="currentPath"
+        placeholder="Path folder/file"
+      >
+
+      <button
+        onclick="openPath()"
+      >
+        Open
+      </button>
+
+      <button
+        class="secondary"
+        onclick="newFolder()"
+      >
+        + Folder
+      </button>
+
+      <button
+        class="secondary"
+        onclick="newFile()"
+      >
+        + File
+      </button>
+
+    </div>
+
+    <div id="files"></div>
+
+  </div>
+
+
+  <!-- EDITOR -->
+
+  <div
+    id="editor"
+    class="card hidden"
+  >
+
+    <h2>Edit File</h2>
+
+    <input
+      id="editPath"
+      readonly
+    >
+
+    <br><br>
+
+    <textarea
+      id="editContent"
+    ></textarea>
+
+    <br>
+
+    <div class="row">
+
+      <button onclick="saveFile()">
+        Save / Overwrite
+      </button>
+
+      <button
+        class="secondary"
+        onclick="closeEditor()"
+      >
+        Cancel
+      </button>
+
+    </div>
+
+    <div
+      id="editorMessage"
+      class="message"
+    ></div>
+
+  </div>
+
+
+  <!-- UPLOAD -->
+
+  <div
+    id="uploadBox"
+    class="card hidden"
+  >
+
+    <h2>Upload File</h2>
+
+    <input
+      id="uploadFile"
+      type="file"
+    >
+
+    <br><br>
+
+    <input
+      id="uploadPath"
+      placeholder="contoh: assets/file.zip"
+    >
+
+    <br><br>
+
+    <button onclick="uploadFile()">
+      Upload
+    </button>
+
+    <div
+      id="uploadMessage"
+      class="message"
+    ></div>
+
+  </div>
+
+
+  <!-- SEARCH -->
+
+  <div class="card">
+
+    <h2>Search</h2>
+
+    <div class="row">
+
+      <input
+        id="searchInput"
+        placeholder="Cari repository..."
+      >
+
+      <button onclick="search()">
+        Search
+      </button>
+
+    </div>
+
+    <div id="searchResults"></div>
+
+  </div>
+
+</section>
 
 </main>
 
 
-<footer>
-  YasamGit Backend V5.2.0
-</footer>
-
-
 <script>
-  /*
-   * Karena frontend dan backend berada
-   * pada domain Vercel yang sama,
-   * gunakan relative API URL.
-   *
-   * Jangan menggunakan:
-   *
-   * https://yasam-git-backend.vercel.app/api
-   *
-   * sehingga tidak terjadi masalah
-   * CORS / Failed to fetch.
-   */
 
-  const API = "/api";
+const API = "/api";
+
+let currentRepo = "";
+let currentFolder = "";
+let currentFileSha = "";
 
 
-  const loginSection =
-    document.getElementById(
-      "loginSection"
-    );
+/* =========================
+   BASIC API
+========================= */
 
-  const dashboardSection =
-    document.getElementById(
-      "dashboardSection"
-    );
+async function request(
+  path,
+  options = {}
+) {
 
-  const loginForm =
-    document.getElementById(
-      "loginForm"
-    );
+  const response =
+    await fetch(
+      API + path,
+      {
+        credentials: "include",
+        ...options,
 
-  const passwordInput =
-    document.getElementById(
-      "password"
-    );
+        headers: {
+          "Content-Type":
+            "application/json",
 
-  const loginButton =
-    document.getElementById(
-      "loginButton"
-    );
-
-  const loginMessage =
-    document.getElementById(
-      "loginMessage"
-    );
-
-  const logoutButton =
-    document.getElementById(
-      "logoutButton"
-    );
-
-  const backendStatus =
-    document.getElementById(
-      "backendStatus"
-    );
-
-  const apiStatus =
-    document.getElementById(
-      "apiStatus"
-    );
-
-
-  function showMessage(
-    element,
-    message,
-    type
-  ) {
-
-    element.textContent =
-      message;
-
-    element.className =
-      "message show " + type;
-
-  }
-
-
-  function clearMessage(element) {
-
-    element.textContent =
-      "";
-
-    element.className =
-      "message";
-
-  }
-
-
-  async function checkBackend() {
-
-    try {
-
-      const response =
-        await fetch(
-          API + "/health",
-          {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store"
-          }
-        );
-
-
-      const data =
-        await response.json();
-
-
-      if (response.ok) {
-
-        backendStatus.textContent =
-          "Backend online";
-
-        apiStatus.textContent =
-          JSON.stringify(
-            data,
-            null,
-            2
-          );
-
-      } else {
-
-        backendStatus.textContent =
-          "Backend error";
-
-        apiStatus.textContent =
-          JSON.stringify(
-            data,
-            null,
-            2
-          );
-
+          ...(options.headers || {})
+        }
       }
+    );
 
-    } catch (error) {
+  let data;
 
-      backendStatus.textContent =
-        "Backend tidak terhubung";
-
-      apiStatus.textContent =
-        error.message;
-
-    }
-
+  try {
+    data =
+      await response.json();
+  } catch {
+    data = {
+      ok: false,
+      error:
+        "Response backend tidak valid."
+    };
   }
 
+  if (!response.ok) {
+    throw new Error(
+      data.error ||
+      "Request gagal."
+    );
+  }
 
-  async function checkSession() {
-
-    try {
-
-      const response =
-        await fetch(
-          API + "/session",
-          {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store"
-          }
-        );
+  return data;
+}
 
 
-      const data =
-        await response.json();
+/* =========================
+   STATUS
+========================= */
+
+async function checkHealth() {
+
+  try {
+
+    const data =
+      await request(
+        "/health"
+      );
+
+    document.getElementById(
+      "status"
+    ).textContent =
+      "● Backend Online";
+
+    document.getElementById(
+      "status"
+    ).className =
+      "status online";
+
+  } catch (error) {
+
+    document.getElementById(
+      "status"
+    ).textContent =
+      "● Backend Error";
+
+  }
+}
 
 
-      if (
-        response.ok &&
-        data.authenticated === true
-      ) {
+/* =========================
+   SESSION
+========================= */
 
-        showDashboard();
+async function checkSession() {
 
-      } else {
+  try {
 
-        showLogin();
+    const data =
+      await request(
+        "/session"
+      );
 
-      }
+    if (
+      data.authenticated
+    ) {
 
-    } catch (error) {
+      showDashboard();
+
+      loadRepos();
+
+    } else {
 
       showLogin();
 
     }
 
-  }
+  } catch {
 
-
-  function showLogin() {
-
-    loginSection.classList.remove(
-      "hidden"
-    );
-
-    dashboardSection.classList.remove(
-      "show"
-    );
+    showLogin();
 
   }
+}
 
 
-  function showDashboard() {
+function showDashboard() {
 
-    loginSection.classList.add(
-      "hidden"
-    );
+  document.getElementById(
+    "loginPage"
+  ).classList.add(
+    "hidden"
+  );
 
-    dashboardSection.classList.add(
-      "show"
-    );
+  document.getElementById(
+    "dashboard"
+  ).classList.remove(
+    "hidden"
+  );
+}
 
-  }
+
+function showLogin() {
+
+  document.getElementById(
+    "loginPage"
+  ).classList.remove(
+    "hidden"
+  );
+
+  document.getElementById(
+    "dashboard"
+  ).classList.add(
+    "hidden"
+  );
+}
 
 
-  loginForm.addEventListener(
+/* =========================
+   LOGIN
+========================= */
+
+document
+  .getElementById(
+    "loginForm"
+  )
+  .addEventListener(
     "submit",
-    async function(event) {
+    async event => {
 
       event.preventDefault();
 
-      clearMessage(
-        loginMessage
-      );
-
       const password =
-        passwordInput.value.trim();
-
-
-      if (!password) {
-
-        showMessage(
-          loginMessage,
-          "Password wajib diisi.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      loginButton.disabled =
-        true;
-
-      loginButton.textContent =
-        "Login...";
-
+        document.getElementById(
+          "password"
+        ).value;
 
       try {
 
-        const response =
-          await fetch(
-            API + "/login",
+        const data =
+          await request(
+            "/login",
             {
               method: "POST",
 
-              credentials:
-                "include",
-
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-
               body:
                 JSON.stringify({
-                  password:
-                    password
+                  password
                 })
             }
           );
 
-
-        let data;
-
-        try {
-
-          data =
-            await response.json();
-
-        } catch {
-
-          data = {
-            ok: false,
-            error:
-              "Response backend tidak valid."
-          };
-
-        }
-
-
-        if (
-          response.ok &&
-          data.ok
-        ) {
+        if (data.ok) {
 
           showMessage(
-            loginMessage,
+            "loginMessage",
             "Login berhasil.",
             "success"
           );
 
-          passwordInput.value =
-            "";
-
           setTimeout(
-            showDashboard,
+            () => {
+
+              showDashboard();
+
+              loadRepos();
+
+            },
             300
-          );
-
-        } else {
-
-          showMessage(
-            loginMessage,
-            data.error ||
-              "Login gagal.",
-            "error"
           );
 
         }
@@ -1039,19 +704,10 @@
       } catch (error) {
 
         showMessage(
-          loginMessage,
-          "Tidak bisa terhubung ke backend: " +
-            error.message,
+          "loginMessage",
+          error.message,
           "error"
         );
-
-      } finally {
-
-        loginButton.disabled =
-          false;
-
-        loginButton.textContent =
-          "Login";
 
       }
 
@@ -1059,46 +715,1223 @@
   );
 
 
-  logoutButton.addEventListener(
-    "click",
-    async function() {
+/* =========================
+   LOGOUT
+========================= */
 
-      try {
+async function logout() {
 
-        await fetch(
-          API + "/logout",
-          {
-            method: "POST",
-            credentials: "include"
-          }
-        );
+  try {
 
-      } catch (error) {
+    await request(
+      "/logout",
+      {
+        method: "POST"
+      }
+    );
 
-        console.error(
-          error
+  } catch {}
+
+  currentRepo = "";
+  currentFolder = "";
+
+  document.getElementById(
+    "repos"
+  ).innerHTML = "";
+
+  document.getElementById(
+    "files"
+  ).innerHTML = "";
+
+  document.getElementById(
+    "fileManager"
+  ).classList.add(
+    "hidden"
+  );
+
+  document.getElementById(
+    "editor"
+  ).classList.add(
+    "hidden"
+  );
+
+  document.getElementById(
+    "uploadBox"
+  ).classList.add(
+    "hidden"
+  );
+
+  showLogin();
+}
+
+
+/* =========================
+   REPOSITORIES
+========================= */
+
+async function loadRepos() {
+
+  const box =
+    document.getElementById(
+      "repos"
+    );
+
+  box.innerHTML =
+    "Loading...";
+
+  try {
+
+    const data =
+      await request(
+        "/repos"
+      );
+
+    box.innerHTML = "";
+
+    if (
+      !data.repos.length
+    ) {
+
+      box.innerHTML =
+        "<p>Belum ada repository.</p>";
+
+      return;
+    }
+
+    data.repos.forEach(
+      repo => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+        div.className =
+          "repo-item";
+
+        div.innerHTML = `
+          <div class="item-title">
+            ${escapeHtml(repo.name)}
+          </div>
+
+          <div class="item-meta">
+            ${repo.private ? "Private" : "Public"}
+          </div>
+
+          <div class="actions">
+            <button onclick="openRepo('${escapeJs(repo.name)}')">
+              Open
+            </button>
+
+            <button
+              class="secondary"
+              onclick="window.open('${escapeJs(repo.html_url)}','_blank')"
+            >
+              GitHub
+            </button>
+          </div>
+        `;
+
+        box.appendChild(div);
+
+      }
+    );
+
+  } catch (error) {
+
+    box.innerHTML =
+      `<div class="message show error">
+        ${escapeHtml(error.message)}
+      </div>`;
+
+  }
+}
+
+
+/* =========================
+   CREATE REPO
+========================= */
+
+async function createRepo() {
+
+  const name =
+    prompt(
+      "Nama repository:"
+    );
+
+  if (!name) return;
+
+  const description =
+    prompt(
+      "Deskripsi repository:",
+      ""
+    );
+
+  const privateRepo =
+    confirm(
+      "Jadikan private?"
+    );
+
+  try {
+
+    await request(
+      "/repos",
+      {
+        method: "POST",
+
+        body:
+          JSON.stringify({
+            name,
+            description,
+            private:
+              privateRepo
+          })
+      }
+    );
+
+    alert(
+      "Repository berhasil dibuat."
+    );
+
+    loadRepos();
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+}
+
+
+/* =========================
+   OPEN REPO
+========================= */
+
+async function openRepo(
+  repo
+) {
+
+  currentRepo =
+    repo;
+
+  currentFolder =
+    "";
+
+  document.getElementById(
+    "repoTitle"
+  ).textContent =
+    "Repository: " +
+    repo;
+
+  document.getElementById(
+    "fileManager"
+  ).classList.remove(
+    "hidden"
+  );
+
+  document.getElementById(
+    "uploadBox"
+  ).classList.remove(
+    "hidden"
+  );
+
+  document.getElementById(
+    "currentPath"
+  ).value =
+    "";
+
+  await openPath();
+
+}
+
+
+/* =========================
+   OPEN PATH
+========================= */
+
+async function openPath() {
+
+  if (!currentRepo) {
+
+    alert(
+      "Pilih repository dulu."
+    );
+
+    return;
+
+  }
+
+  const path =
+    document.getElementById(
+      "currentPath"
+    ).value.trim();
+
+  currentFolder =
+    path;
+
+  const files =
+    document.getElementById(
+      "files"
+    );
+
+  files.innerHTML =
+    "Loading...";
+
+  try {
+
+    const data =
+      await request(
+        `/repo?repo=${encodeURIComponent(
+          currentRepo
+        )}&path=${encodeURIComponent(
+          path
+        )}`
+      );
+
+    renderFiles(
+      data.data
+    );
+
+  } catch (error) {
+
+    files.innerHTML =
+      `<div class="message show error">
+        ${escapeHtml(error.message)}
+      </div>`;
+
+  }
+}
+
+
+/* =========================
+   RENDER FILES
+========================= */
+
+function renderFiles(
+  data
+) {
+
+  const box =
+    document.getElementById(
+      "files"
+    );
+
+  box.innerHTML = "";
+
+  if (
+    !Array.isArray(data)
+  ) {
+
+    box.innerHTML =
+      "<p>Path bukan folder.</p>";
+
+    return;
+
+  }
+
+  if (
+    currentFolder
+  ) {
+
+    const back =
+      document.createElement(
+        "div"
+      );
+
+    back.className =
+      "file-item";
+
+    back.innerHTML = `
+      <div class="item-title">
+        📁 ..
+      </div>
+
+      <div class="actions">
+        <button
+          class="secondary"
+          onclick="goParent()"
+        >
+          Kembali
+        </button>
+      </div>
+    `;
+
+    box.appendChild(
+      back
+    );
+  }
+
+  data
+    .sort(
+      (a, b) =>
+        a.type === b.type
+          ? a.name.localeCompare(b.name)
+          : a.type === "dir"
+            ? -1
+            : 1
+    )
+    .forEach(
+      item => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+        div.className =
+          "file-item";
+
+        const icon =
+          item.type === "dir"
+            ? "📁"
+            : "📄";
+
+        div.innerHTML = `
+          <div class="item-title">
+            ${icon}
+            ${escapeHtml(item.name)}
+          </div>
+
+          <div class="item-meta">
+            ${item.type}
+            ${item.size ? " • " + item.size + " bytes" : ""}
+          </div>
+
+          <div class="actions">
+
+            ${
+              item.type === "dir"
+                ? `
+                  <button onclick="openFolder('${escapeJs(item.path)}')">
+                    Open
+                  </button>
+                `
+                : `
+                  <button onclick="editFile('${escapeJs(item.path)}')">
+                    Edit
+                  </button>
+
+                  <button onclick="previewFile('${escapeJs(item.path)}')">
+                    Preview
+                  </button>
+
+                  <button onclick="renameItem('${escapeJs(item.path)}')">
+                    Rename
+                  </button>
+
+                  <button
+                    class="danger"
+                    onclick="deleteItem('${escapeJs(item.path)}','${escapeJs(item.sha)}')"
+                  >
+                    Delete
+                  </button>
+                `
+            }
+
+          </div>
+        `;
+
+        box.appendChild(
+          div
         );
 
       }
+    );
+}
 
-      showLogin();
 
-      clearMessage(
-        loginMessage
+/* =========================
+   FOLDER
+========================= */
+
+async function openFolder(
+  path
+) {
+
+  document.getElementById(
+    "currentPath"
+  ).value =
+    path;
+
+  await openPath();
+
+}
+
+
+function goParent() {
+
+  const parts =
+    currentFolder
+      .split("/")
+      .filter(Boolean);
+
+  parts.pop();
+
+  document.getElementById(
+    "currentPath"
+  ).value =
+    parts.join("/");
+
+  openPath();
+
+}
+
+
+async function newFolder() {
+
+  if (!currentRepo) {
+    alert(
+      "Pilih repository."
+    );
+    return;
+  }
+
+  const name =
+    prompt(
+      "Nama folder:"
+    );
+
+  if (!name) return;
+
+  const path =
+    currentFolder
+      ? currentFolder + "/" + name
+      : name;
+
+  try {
+
+    await request(
+      "/folder",
+      {
+        method: "POST",
+
+        body:
+          JSON.stringify({
+            repo:
+              currentRepo,
+            path
+          })
+      }
+    );
+
+    await openPath();
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+}
+
+
+/* =========================
+   NEW FILE
+========================= */
+
+function newFile() {
+
+  if (!currentRepo) {
+    alert(
+      "Pilih repository."
+    );
+    return;
+  }
+
+  const name =
+    prompt(
+      "Nama file:"
+    );
+
+  if (!name) return;
+
+  const path =
+    currentFolder
+      ? currentFolder + "/" + name
+      : name;
+
+  currentFileSha =
+    "";
+
+  document.getElementById(
+    "editPath"
+  ).value =
+    path;
+
+  document.getElementById(
+    "editContent"
+  ).value =
+    "";
+
+  document.getElementById(
+    "editor"
+  ).classList.remove(
+    "hidden"
+  );
+
+}
+
+
+/* =========================
+   EDIT
+========================= */
+
+async function editFile(
+  path
+) {
+
+  try {
+
+    const data =
+      await request(
+        `/file?repo=${encodeURIComponent(
+          currentRepo
+        )}&path=${encodeURIComponent(
+          path
+        )}`
+      );
+
+    currentFileSha =
+      data.data.sha;
+
+    document.getElementById(
+      "editPath"
+    ).value =
+      path;
+
+    document.getElementById(
+      "editContent"
+    ).value =
+      data.data.content || "";
+
+    document.getElementById(
+      "editor"
+    ).classList.remove(
+      "hidden"
+    );
+
+    window.scrollTo({
+      top:
+        document.getElementById(
+          "editor"
+        ).offsetTop,
+      behavior:
+        "smooth"
+    });
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+
+async function saveFile() {
+
+  const path =
+    document.getElementById(
+      "editPath"
+    ).value;
+
+  const content =
+    document.getElementById(
+      "editContent"
+    ).value;
+
+  try {
+
+    await request(
+      "/file/save",
+      {
+        method: "PUT",
+
+        body:
+          JSON.stringify({
+            repo:
+              currentRepo,
+
+            path,
+
+            content,
+
+            sha:
+              currentFileSha
+          })
+      }
+    );
+
+    showMessage(
+      "editorMessage",
+      "File berhasil disimpan.",
+      "success"
+    );
+
+    await openPath();
+
+  } catch (error) {
+
+    showMessage(
+      "editorMessage",
+      error.message,
+      "error"
+    );
+
+  }
+
+}
+
+
+function closeEditor() {
+
+  document.getElementById(
+    "editor"
+  ).classList.add(
+    "hidden"
+  );
+
+}
+
+
+/* =========================
+   PREVIEW
+========================= */
+
+async function previewFile(
+  path
+) {
+
+  try {
+
+    const data =
+      await request(
+        `/file?repo=${encodeURIComponent(
+          currentRepo
+        )}&path=${encodeURIComponent(
+          path
+        )}`
+      );
+
+    const content =
+      data.data.content || "";
+
+    const win =
+      window.open(
+        "",
+        "_blank"
+      );
+
+    if (!win) {
+
+      alert(
+        "Popup diblokir browser."
+      );
+
+      return;
+
+    }
+
+    win.document.write(`
+      <html>
+      <head>
+        <title>${escapeHtml(path)}</title>
+
+        <style>
+          body {
+            background:#020617;
+            color:#e5e7eb;
+            font-family:monospace;
+            padding:20px;
+          }
+
+          pre {
+            white-space:pre-wrap;
+            word-break:break-word;
+          }
+        </style>
+      </head>
+
+      <body>
+        <h3>${escapeHtml(path)}</h3>
+
+        <pre>${escapeHtml(content)}</pre>
+      </body>
+      </html>
+    `);
+
+    win.document.close();
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================
+   RENAME
+========================= */
+
+async function renameItem(
+  oldPath
+) {
+
+  const parts =
+    oldPath.split("/");
+
+  const oldName =
+    parts.pop();
+
+  const newName =
+    prompt(
+      "Nama baru:",
+      oldName
+    );
+
+  if (!newName) return;
+
+  const newPath =
+    parts.length
+      ? parts.join("/") +
+        "/" +
+        newName
+      : newName;
+
+  try {
+
+    await request(
+      "/rename",
+      {
+        method: "POST",
+
+        body:
+          JSON.stringify({
+            repo:
+              currentRepo,
+
+            oldPath,
+
+            newPath
+          })
+      }
+    );
+
+    await openPath();
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================
+   DELETE
+========================= */
+
+async function deleteItem(
+  path,
+  sha
+) {
+
+  if (
+    !confirm(
+      "Hapus " +
+      path +
+      "?"
+    )
+  ) {
+    return;
+  }
+
+  try {
+
+    await request(
+      "/delete",
+      {
+        method: "DELETE",
+
+        body:
+          JSON.stringify({
+            repo:
+              currentRepo,
+
+            path,
+
+            sha
+          })
+      }
+    );
+
+    await openPath();
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================
+   UPLOAD
+========================= */
+
+async function uploadFile() {
+
+  const input =
+    document.getElementById(
+      "uploadFile"
+    );
+
+  const pathInput =
+    document.getElementById(
+      "uploadPath"
+    );
+
+  const file =
+    input.files[0];
+
+  if (!file) {
+
+    alert(
+      "Pilih file terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+  let path =
+    pathInput.value.trim();
+
+  if (!path) {
+
+    path =
+      currentFolder
+        ? currentFolder +
+          "/" +
+          file.name
+        : file.name;
+
+  }
+
+  try {
+
+    showMessage(
+      "uploadMessage",
+      "Membaca file...",
+      "success"
+    );
+
+    const base64 =
+      await fileToBase64(
+        file
+      );
+
+    await request(
+      "/upload",
+      {
+        method: "POST",
+
+        body:
+          JSON.stringify({
+            repo:
+              currentRepo,
+
+            path,
+
+            base64,
+
+            message:
+              `YasamGit: upload ${path}`
+          })
+      }
+    );
+
+    showMessage(
+      "uploadMessage",
+      "Upload berhasil.",
+      "success"
+    );
+
+    input.value = "";
+
+    pathInput.value = "";
+
+    await openPath();
+
+  } catch (error) {
+
+    showMessage(
+      "uploadMessage",
+      error.message,
+      "error"
+    );
+
+  }
+
+}
+
+
+function fileToBase64(
+  file
+) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const reader =
+        new FileReader();
+
+      reader.onload =
+        () => {
+
+          const result =
+            String(
+              reader.result
+            );
+
+          const comma =
+            result.indexOf(",");
+
+          resolve(
+            comma === -1
+              ? result
+              : result.slice(
+                  comma + 1
+                )
+          );
+
+        };
+
+      reader.onerror =
+        reject;
+
+      reader.readAsDataURL(
+        file
       );
 
     }
   );
 
+}
 
-  /*
-   * Jalankan pemeriksaan
-   * saat halaman dibuka.
-   */
 
-  checkBackend();
+/* =========================
+   SEARCH
+========================= */
 
-  checkSession();
+async function search() {
+
+  const query =
+    document.getElementById(
+      "searchInput"
+    ).value.trim();
+
+  if (!query) return;
+
+  const box =
+    document.getElementById(
+      "searchResults"
+    );
+
+  box.innerHTML =
+    "Searching...";
+
+  try {
+
+    const data =
+      await request(
+        `/search?q=${encodeURIComponent(
+          query
+        )}`
+      );
+
+    box.innerHTML = "";
+
+    if (
+      !data.results.length
+    ) {
+
+      box.innerHTML =
+        "<p>Tidak ditemukan.</p>";
+
+      return;
+
+    }
+
+    data.results.forEach(
+      item => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+        div.className =
+          "repo-item";
+
+        div.innerHTML = `
+          <div class="item-title">
+            ${escapeHtml(
+              item.full_name ||
+              item.name
+            )}
+          </div>
+
+          <div class="item-meta">
+            ${escapeHtml(
+              item.description ||
+              item.path ||
+              ""
+            )}
+          </div>
+
+          ${
+            item.html_url
+              ? `
+                <div class="actions">
+                  <button
+                    onclick="window.open('${escapeJs(item.html_url)}','_blank')"
+                  >
+                    Open
+                  </button>
+                </div>
+              `
+              : ""
+          }
+        `;
+
+        box.appendChild(
+          div
+        );
+
+      }
+    );
+
+  } catch (error) {
+
+    box.innerHTML =
+      `<div class="message show error">
+        ${escapeHtml(error.message)}
+      </div>`;
+
+  }
+
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+function showMessage(
+  id,
+  message,
+  type
+) {
+
+  const el =
+    document.getElementById(
+      id
+    );
+
+  el.textContent =
+    message;
+
+  el.className =
+    "message show " +
+    type;
+
+}
+
+
+/* =========================
+   SECURITY HELPERS
+========================= */
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+function escapeJs(
+  value
+) {
+
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /\\/g,
+      "\\\\"
+    )
+    .replace(
+      /'/g,
+      "\\'"
+    )
+    .replace(
+      /\n/g,
+      "\\n"
+    )
+    .replace(
+      /\r/g,
+      "\\r"
+    );
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+checkHealth();
+checkSession();
 
 </script>
 
