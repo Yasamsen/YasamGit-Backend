@@ -1,14 +1,11 @@
 {
-  "name": "yasamgit",
+  "name": "yasamgit-backend",
   "version": "5.2.0",
   "private": true,
-  "description": "YasamGit V5.2 - GitHub Repository Manager",
-  "main": "api/index.js",
-  "scripts": {
-    "start": "node api/index.js"
-  },
   "engines": {
     "node": "22.x"
   },
-  "dependencies": {}
+  "scripts": {
+    "start": "node api/index.js"
+  }
 }
