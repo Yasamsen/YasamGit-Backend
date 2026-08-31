@@ -1,9 +1,71 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/api/:path*",
-      "destination": "/api"
+      "src": "api/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/repos/create",
+      "dest": "/api/repos-create.js"
+    },
+    {
+      "src": "/api/repos/delete",
+      "dest": "/api/repos-delete.js"
+    },
+    {
+      "src": "/api/repos/rename",
+      "dest": "/api/repos-rename.js"
+    },
+    {
+      "src": "/api/repos",
+      "dest": "/api/repos.js"
+    },
+    {
+      "src": "/api/files/upload",
+      "dest": "/api/files-upload.js"
+    },
+    {
+      "src": "/api/files/download",
+      "dest": "/api/files-download.js"
+    },
+    {
+      "src": "/api/files/preview",
+      "dest": "/api/files-preview.js"
+    },
+    {
+      "src": "/api/files/edit",
+      "dest": "/api/files-edit.js"
+    },
+    {
+      "src": "/api/files/delete",
+      "dest": "/api/files-delete.js"
+    },
+    {
+      "src": "/api/files/rename",
+      "dest": "/api/files-rename.js"
+    },
+    {
+      "src": "/api/files/folder",
+      "dest": "/api/files-folder.js"
+    },
+    {
+      "src": "/api/files",
+      "dest": "/api/files.js"
+    },
+    {
+      "src": "/api/search",
+      "dest": "/api/search.js"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
     }
   ]
 }
